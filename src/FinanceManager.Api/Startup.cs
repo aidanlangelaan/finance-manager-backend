@@ -26,8 +26,7 @@ namespace FinanceManager.Api
         {
             // Setup dependency injection
             services.ConfigureDataServices(Configuration["ConnectionStrings:FinanceManagerContext"])
-                .ConfigureApplicationServices()
-                .ConfigureApiServices();
+                .ConfigureApplicationServices();
 
             services.AddControllers();
 

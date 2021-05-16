@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FinanceManager.Business.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,34 +17,53 @@ namespace FinanceManager.Api.Controllers
             _transactionService = transactionService;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Get()
-        //{
-        //    return Ok();
-        //}
 
-        //[HttpGet]
-        //public async Task<IActionResult> Get(int id)
-        //{
-        //    return Ok();
-        //}
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var transactions = await _transactionService.GetAll();
+            return Ok(transactions);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var transaction = await _transactionService.GetById(id);
+            if (transaction != null)
+            {
+                return Ok(transaction);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create()
         {
-            return Ok();
+            throw new NotImplementedException();
         }
 
         [HttpPut]
         public async Task<IActionResult> Update()
         {
-            return Ok();
+            throw new NotImplementedException();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return Ok();
+            var transaction = await _transactionService.GetById(id);
+            if (transaction != null)
+            {
+                await _transactionService.Delete(transaction);
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }
