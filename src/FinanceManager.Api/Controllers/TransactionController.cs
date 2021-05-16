@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Api.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionController : ControllerBase
@@ -15,17 +16,17 @@ namespace FinanceManager.Api.Controllers
             _transactionService = transactionService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            return Ok();
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Get()
+        //{
+        //    return Ok();
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> Get(int id)
-        {
-            return Ok();
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Get(int id)
+        //{
+        //    return Ok();
+        //}
 
         [HttpPost]
         public async Task<IActionResult> Create()

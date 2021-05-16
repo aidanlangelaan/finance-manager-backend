@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using System.Reflection;
-using AutoMapper;
+using FinanceManager.Business;
+using FinanceManager.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using FinanceManager.Data;
-using FinanceManager.Business;
 
 namespace FinanceManager.Api
 {
@@ -32,16 +31,16 @@ namespace FinanceManager.Api
 
             services.AddControllers();
 
-            services.AddAutoMapper(typeof(Startup));
-
-            AddSwagger(services);
-
             services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
 
             services.Configure<IISServerOptions>(options =>
             {
                 options.AutomaticAuthentication = false;
             });
+
+            services.AddAutoMapper(typeof(Startup));
+
+            AddSwagger(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +54,10 @@ namespace FinanceManager.Api
                     .AllowAnyHeader()
                     .Build());
             }
+            else
+            {
+                app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
 
@@ -65,6 +68,12 @@ namespace FinanceManager.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Finance Manager API");
             });
         }
 
@@ -87,7 +96,7 @@ namespace FinanceManager.Api
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, "Properties", xmlFile);
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);
             });
         }
