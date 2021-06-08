@@ -1,0 +1,51 @@
+Account
+- id : PK
+- iban
+- name
+- type
+
+Transaction
+- id : PK
+- amount
+- fromAccountId : FK
+- toAccountId : FK
+- description
+- date
+- categoryId : FK
+
+
+Category
+- id : Id
+- description
+
+
+Rabobank
+- IBAN is altijd eigen rekening (betaal / spaar)
+- Tegenpartij is de rekening die geld ontvangt of betaalt
+- Als bedrag negatief is, betekent het afschrijving van eigen rekening naar tegenpartij
+- Als bedrag positief is, betekent het bijschrijving op eigen rekening vanaf tegenpartij
+
+
+- Moet ik balans bij rekening opnemen? 
+nee, start balans wordt een losse transactie. Dit betekent wel dat je niet al te veel kan rommelen met transacties van voordat je de start balans ingesteld hebt. Dit heeft
+namelijk gevolgen voor de geschiedenis van een rekening. 
+
+
+- Moet currency bij een transactie opgenomen worden?
+TODO
+
+
+====================
+
+- Account type
+Need to do some more thinking on this.
+
+- Asset
+* payment
+* savings
+* shared?
+* cash?
+
+- Expense
+* loan?
+* debts?

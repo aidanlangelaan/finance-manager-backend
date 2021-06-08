@@ -11,10 +11,6 @@ namespace FinanceManager.Data.Entities
         public double Amount { get; set; }
 
         [Required]
-        [Column(TypeName = "float")]
-        public double BalanceAfter { get; set; }
-
-        [Required]
         [Column(TypeName = "int")]
         public int FromAccountId { get; set; }
 
@@ -31,7 +27,7 @@ namespace FinanceManager.Data.Entities
 
         [Required]
         [Column(TypeName = "int")]
-        public int CategoryId { get; set; }
+        public int CategoryId { get; set; } = 1;
 
 
         // Foreign keys
