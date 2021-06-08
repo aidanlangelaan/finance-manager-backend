@@ -351,3 +351,4 @@ MigrationBackup/
 
 # Local configuration
 appsettings.local.json
+*.ignore.sql
