@@ -10,16 +10,7 @@ namespace FinanceManager.Data.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [Column(TypeName = "datetime2(7)")]
-        public DateTime CreatedOnAt { get; set; }
-
-        [Required]
-        [Column(TypeName = "datetime2(7)")]
-        public DateTime UpdatedOnAt { get; set; }
-
-        [Required]
-        [Column(TypeName = "timestamp")]
+        [Timestamp]
         public Byte[] RowVersion { get; set; }
     }
 }

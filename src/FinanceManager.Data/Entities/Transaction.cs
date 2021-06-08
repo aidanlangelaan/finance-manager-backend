@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinanceManager.Data.Entities
 {
-    public class Transaction : EntityBase
+    public class Transaction : AuditableEntity
     {
         [Required]
         [Column(TypeName = "float")]

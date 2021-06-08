@@ -4,14 +4,16 @@ using FinanceManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FinanceManager.Data.Migrations
 {
     [DbContext(typeof(FinanceManagerDbContext))]
-    partial class FinanceManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210608215335_RemoveRowVersion")]
+    partial class RemoveRowVersion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,11 +37,6 @@ namespace FinanceManager.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<byte>("Type")
                         .HasColumnType("tinyint");
@@ -65,11 +62,6 @@ namespace FinanceManager.Data.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("datetime2(7)");
@@ -103,11 +95,6 @@ namespace FinanceManager.Data.Migrations
 
                     b.Property<int>("FromAccountId")
                         .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<int>("ToAccountId")
                         .HasColumnType("int");

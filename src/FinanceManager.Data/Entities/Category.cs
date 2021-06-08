@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinanceManager.Data.Entities
 {
-    public class Category : EntityBase
+    public class Category : AuditableEntity
     {
         [Required]
         [Column(TypeName = "varchar(255)")]

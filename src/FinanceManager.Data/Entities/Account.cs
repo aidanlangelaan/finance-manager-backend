@@ -5,7 +5,7 @@ using FinanceManager.Data.Enums;
 
 namespace FinanceManager.Data.Entities
 {
-    public class Account : EntityBase
+    public class Account : AuditableEntity
     {
         [Column(TypeName = "varchar(255)")]
         public string Iban { get; set; }
