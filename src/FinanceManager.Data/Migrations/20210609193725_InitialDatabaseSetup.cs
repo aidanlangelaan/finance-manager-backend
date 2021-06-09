@@ -13,11 +13,12 @@ namespace FinanceManager.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     CreatedOnAt = table.Column<DateTime>(type: "datetime2(7)", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "datetime2(7)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "timestamp", nullable: false),
                     Iban = table.Column<string>(type: "varchar(255)", nullable: true),
-                    Name = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Name = table.Column<string>(type: "varchar(255)", nullable: false),
+                    Type = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,9 +31,9 @@ namespace FinanceManager.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     CreatedOnAt = table.Column<DateTime>(type: "datetime2(7)", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "datetime2(7)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "timestamp", nullable: false),
                     Description = table.Column<string>(type: "varchar(255)", nullable: false)
                 },
                 constraints: table =>
@@ -46,11 +47,10 @@ namespace FinanceManager.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     CreatedOnAt = table.Column<DateTime>(type: "datetime2(7)", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "datetime2(7)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "timestamp", nullable: false),
                     Amount = table.Column<double>(type: "float", nullable: false),
-                    BalanceAfter = table.Column<double>(type: "float", nullable: false),
                     FromAccountId = table.Column<int>(type: "int", nullable: false),
                     ToAccountId = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2(7)", nullable: false),

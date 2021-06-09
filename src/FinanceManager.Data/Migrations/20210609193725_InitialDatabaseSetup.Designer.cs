@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinanceManager.Data.Migrations
 {
     [DbContext(typeof(FinanceManagerDbContext))]
-    [Migration("20210512200114_InitialDatabaseSetup")]
+    [Migration("20210609193725_InitialDatabaseSetup")]
     partial class InitialDatabaseSetup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,8 +39,12 @@ namespace FinanceManager.Data.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<byte[]>("RowVersion")
-                        .IsRequired()
-                        .HasColumnType("timestamp");
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<byte>("Type")
+                        .HasColumnType("tinyint");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("datetime2(7)");
@@ -65,8 +69,9 @@ namespace FinanceManager.Data.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<byte[]>("RowVersion")
-                        .IsRequired()
-                        .HasColumnType("timestamp");
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("datetime2(7)");
@@ -86,9 +91,6 @@ namespace FinanceManager.Data.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<double>("BalanceAfter")
-                        .HasColumnType("float");
-
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -105,8 +107,9 @@ namespace FinanceManager.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<byte[]>("RowVersion")
-                        .IsRequired()
-                        .HasColumnType("timestamp");
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<int>("ToAccountId")
                         .HasColumnType("int");

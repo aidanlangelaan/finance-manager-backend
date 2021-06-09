@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using FinanceManager.Data.Entities;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using System.Threading;
+using FinanceManager.Data.Entities;
 using FinanceManager.Data.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.Data
 {
@@ -21,6 +21,8 @@ namespace FinanceManager.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.ToAccount)
                 .WithMany(a => a.TransactionsTo)

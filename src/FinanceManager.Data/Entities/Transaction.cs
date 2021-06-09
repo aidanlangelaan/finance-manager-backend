@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using FinanceManager.Data.Constants;
 
 namespace FinanceManager.Data.Entities
 {
@@ -27,7 +28,7 @@ namespace FinanceManager.Data.Entities
 
         [Required]
         [Column(TypeName = "int")]
-        public int CategoryId { get; set; } = 1;
+        public int CategoryId { get; set; } = CategoryConstants.UncategorizedId;
 
 
         // Foreign keys

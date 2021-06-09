@@ -21,13 +21,5 @@ namespace FinanceManager.Data.Entities
         // Relations
         public virtual IEnumerable<Transaction> TransactionsFrom { get; set; }
         public virtual IEnumerable<Transaction> TransactionsTo { get; set; }
-
-
-        public Account(string iban, string name, AccountType type = AccountType.Expense)
-        {
-            Iban = iban;
-            Name = name;
-            Type = type;
-        }
     }
 }
