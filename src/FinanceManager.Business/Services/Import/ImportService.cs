@@ -4,39 +4,47 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Import;
 using FinanceManager.Data;
+using FinanceManager.Data.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace FinanceManager.Business.Services
 {
     public class ImportService : IImportService
     {
         private readonly FinanceManagerDbContext _context;
+        private readonly ILogger<ImportService> _logger;
+        private readonly IMapper _mapper;
 
-        public ImportService(FinanceManagerDbContext context)
+        public ImportService(FinanceManagerDbContext context, ILogger<ImportService> logger, IMapper mapper)
         {
             _context = context;
+            _logger = logger;
+            _mapper = mapper;
         }
 
-        public async Task<bool> ProcessImport(ICollection<IFormFile> files)
+        public async Task<List<CsvImportResult>> ProcessImport(ICollection<IFormFile> files)
         {
+            var results = new List<CsvImportResult>();
             foreach (var file in files)
             {
-                if (file.Length > 0)
-                {
-                    await ProcessFile(file);
-                }
+                var result = await ProcessFile(file);
+                result.FileName = file.FileName;
+                results.Add(result);
             }
-
-            return true;
+            return results;
         }
 
-        private async Task ProcessFile(IFormFile file)
+        private async Task<CsvImportResult> ProcessFile(IFormFile file)
         {
+            CsvImportResult result = null;
             var readerConfig = new CsvConfiguration(new CultureInfo("nl-NL"));
             readerConfig.Delimiter = ",";
 
@@ -46,12 +54,82 @@ namespace FinanceManager.Business.Services
                 try
                 {
                     var records = csv.GetRecords<CsvImportRabo>().ToList();
+                    if (records.Count > 0)
+                    {
+                        result = await ProcessRecords(records);
+                    }
                 }
-                catch(BadDataException badDataException)
+                catch (BadDataException badDataException)
                 {
-                    // TODO: do something with the bad data
+                    _logger.LogError("Failed to process imported file", badDataException.ToString());
+                    result = new CsvImportResult();
                 }
             }
+
+            return result;
+        }
+
+        private async Task<CsvImportResult> ProcessRecords(List<CsvImportRabo> records)
+        {
+            var result = new CsvImportResult();
+
+            foreach (var record in records)
+            {
+                try
+                {
+                    var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Iban == record.Iban);
+                    if (account == null)
+                    {
+                        account = new Account()
+                        {
+                            Iban = record.Iban,
+                            Name = String.Empty
+                        };
+
+                        _context.Accounts.Add(account);
+                    }
+
+                    var counterpartyAccount = await _context.Accounts.FirstOrDefaultAsync(a => a.Iban == record.CounterpartyIban || a.Name.ToLower() == record.CounterpartyName.ToLower());
+                    if (counterpartyAccount == null)
+                    {
+                        counterpartyAccount = new Account()
+                        {
+                            Iban = record.CounterpartyIban,
+                            Name = record.CounterpartyName
+                        };
+                        _context.Accounts.Add(counterpartyAccount);
+                    }
+
+                    if (_context.ChangeTracker.HasChanges())
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+
+                    var transaction = _mapper.Map<Transaction>(record);
+                    if (transaction.Amount < 0)
+                    {
+                        transaction.ToAccountId = counterpartyAccount.Id;
+                        transaction.FromAccountId = account.Id;
+                    }
+                    else
+                    {
+                        transaction.ToAccountId = account.Id;
+                        transaction.FromAccountId = counterpartyAccount.Id;
+                    }
+
+                    _context.Transactions.Add(transaction);
+                    await _context.SaveChangesAsync();
+
+                    result.Imported += 1;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("Failed to process record", e.ToString());
+                    result.Failed.Add(record);
+                }
+            }
+
+            return result;
         }
     }
 }

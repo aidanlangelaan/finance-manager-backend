@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FinanceManager.Business.Interfaces;
+using FinanceManager.Business.Services.Import;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,16 +30,24 @@ namespace FinanceManager.Api.Controllers
         ///
         /// </remarks>
         /// <returns>TODO</returns>
-        /// <response code="200">TODO</response>
-        /// <response code="400">TODO</response>          
+        /// <response code="200">File(s) have successfully been processed and imported</response>
+        /// <response code="400">Failed to process files and import records</response>          
         [HttpPost("transactions")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(List<CsvImportResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<CsvImportResult>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ImportTransactions(ICollection<IFormFile> files)
         {
-            await _importService.ProcessImport(files);
+            List<CsvImportResult> result = new List<CsvImportResult>();
+            if (files.Count > 0)
+            {
+                result = await _importService.ProcessImport(files);
+                if (!result.Any(r => !r.IsSuccess))
+                {
+                    return Ok(result);
+                }
+            }
 
-            return Ok();
+            return BadRequest(result);
         }
     }
 }

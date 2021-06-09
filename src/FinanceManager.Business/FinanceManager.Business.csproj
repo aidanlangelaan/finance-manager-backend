@@ -14,10 +14,4 @@
     <ProjectReference Include="..\FinanceManager.Data\FinanceManager.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Account\Models\" />
-    <Folder Include="Services\Category\Models\" />
-    <Folder Include="Services\Transaction\Models\" />
-  </ItemGroup>
-
 </Project>

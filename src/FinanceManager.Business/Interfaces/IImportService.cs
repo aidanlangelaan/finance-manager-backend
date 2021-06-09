@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using FinanceManager.Business.Services.Import;
 using Microsoft.AspNetCore.Http;
 
 namespace FinanceManager.Business.Interfaces
 {
     public interface IImportService
     {
-        public Task<bool> ProcessImport(ICollection<IFormFile> files);
+        public Task<List<CsvImportResult>> ProcessImport(ICollection<IFormFile> files);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using FinanceManager.Business;
+using FinanceManager.Business.configurations;
 using FinanceManager.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +38,7 @@ namespace FinanceManager.Api
                 options.AutomaticAuthentication = false;
             });
 
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(AccountMapperProfile));
 
             AddSwagger(services);
         }
