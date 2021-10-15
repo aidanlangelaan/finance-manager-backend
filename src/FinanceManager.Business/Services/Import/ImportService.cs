@@ -77,44 +77,19 @@ namespace FinanceManager.Business.Services
             {
                 try
                 {
-                    var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Iban == record.Iban);
-                    if (account == null)
-                    {
-                        account = new Account()
-                        {
-                            Iban = record.Iban,
-                            Name = String.Empty
-                        };
-
-                        _context.Accounts.Add(account);
-                    }
-
-                    var counterpartyAccount = await _context.Accounts.FirstOrDefaultAsync(a => a.Iban == record.CounterpartyIban || a.Name.ToLower() == record.CounterpartyName.ToLower());
-                    if (counterpartyAccount == null)
-                    {
-                        counterpartyAccount = new Account()
-                        {
-                            Iban = record.CounterpartyIban,
-                            Name = record.CounterpartyName
-                        };
-                        _context.Accounts.Add(counterpartyAccount);
-                    }
-
-                    if (_context.ChangeTracker.HasChanges())
-                    {
-                        await _context.SaveChangesAsync();
-                    }
+                    Account account = await GetFromAccount(record);
+                    Account counterpartyAccount = await GetCounterPartyAccount(record);
 
                     var transaction = _mapper.Map<Transaction>(record);
                     if (transaction.Amount < 0)
                     {
-                        transaction.ToAccountId = counterpartyAccount.Id;
-                        transaction.FromAccountId = account.Id;
+                        transaction.ToAccount = counterpartyAccount;
+                        transaction.FromAccount = account;
                     }
                     else
                     {
-                        transaction.ToAccountId = account.Id;
-                        transaction.FromAccountId = counterpartyAccount.Id;
+                        transaction.ToAccount = account;
+                        transaction.FromAccount = counterpartyAccount;
                     }
 
                     _context.Transactions.Add(transaction);
@@ -130,6 +105,43 @@ namespace FinanceManager.Business.Services
             }
 
             return result;
+        }
+
+        private async Task<Account> GetCounterPartyAccount(CsvImportRabo record)
+        {
+            var counterpartyAccount = await _context.Accounts
+                                    .FirstOrDefaultAsync(a => (!string.IsNullOrEmpty(a.Iban) && a.Iban == record.CounterpartyIban) ||
+                                        a.Name.ToLower() == record.CounterpartyName.ToLower());
+            if (counterpartyAccount == null)
+            {
+                counterpartyAccount = new Account()
+                {
+                    Iban = record.CounterpartyIban,
+                    Name = record.CounterpartyName
+                };
+                _context.Accounts.Add(counterpartyAccount);
+            }
+
+            return counterpartyAccount;
+        }
+
+        private async Task<Account> GetFromAccount(CsvImportRabo record)
+        {
+            var account = await _context.Accounts
+                                    .FirstOrDefaultAsync(a =>
+                                        a.Iban == record.Iban);
+            if (account == null)
+            {
+                account = new Account()
+                {
+                    Iban = record.Iban,
+                    Name = String.Empty
+                };
+
+                _context.Accounts.Add(account);
+            }
+
+            return account;
         }
     }
 }

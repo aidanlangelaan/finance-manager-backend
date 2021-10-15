@@ -6,8 +6,8 @@ namespace FinanceManager.Data.Enums
 {
     public enum AccountType
     {
-        Payment = 1,
-        Savings = 2,
-        Expense = 3,
+        Asset = 1,
+        Expense = 2,
+        Saving = 3,
     }
 }
