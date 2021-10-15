@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace FinanceManager.Api
+namespace FinanceManager.Api.Models
 {
-    public class TransactionViewViewModel
+    public class UpdateTransactionViewModel
     {
-        public decimal Amount { get; set; }
+        public int Id { get; set; }
 
-        public decimal BalanceAfter { get; set; }
+        public double Amount { get; set; }
 
         public int FromAccountId { get; set; }
 

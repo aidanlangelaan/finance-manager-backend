@@ -44,7 +44,6 @@ namespace FinanceManager.Data
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             ChangeTracker.ApplyAuditInformation();
-
             return await base.SaveChangesAsync(cancellationToken);
         }
     }

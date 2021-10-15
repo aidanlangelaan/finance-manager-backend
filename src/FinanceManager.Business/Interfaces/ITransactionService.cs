@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FinanceManager.Data.Entities;
+using FinanceManager.Business.Services.Models;
 
 namespace FinanceManager.Business.Interfaces
 {
     public interface ITransactionService
     {
-        public Task<List<Transaction>> GetAll();
+        public Task<List<GetTransactionDTO>> GetAll();
 
-        public Task<Transaction> GetById(int id);
+        public Task<GetTransactionDTO> GetById(int id);
 
-        public Task<Transaction> Create(Transaction model);
+        public Task<GetTransactionDTO> Create(CreateTransactionDTO model);
 
-        public Task Update(Transaction model);
+        public Task Update(UpdateTransactionDTO model);
 
-        public Task Delete(Transaction model);
+        public Task Delete(int id);
     }
 }

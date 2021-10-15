@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using FinanceManager.Api.Configurations;
 using FinanceManager.Business;
 using FinanceManager.Business.configurations;
 using FinanceManager.Data;
@@ -38,7 +39,9 @@ namespace FinanceManager.Api
                 options.AutomaticAuthentication = false;
             });
 
-            services.AddAutoMapper(typeof(AccountMapperProfile));
+            services.SetupFluentValidation();
+
+            services.AddAutoMapper(typeof(TransactionViewModelMapperProfile), typeof(TransactionMapperProfile));
 
             AddSwagger(services);
         }
