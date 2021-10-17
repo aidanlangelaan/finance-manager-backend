@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FinanceManager.Business.Services.Import;
+using FinanceManager.Business.Services.Models;
 using FinanceManager.Data.Entities;
 
 namespace FinanceManager.Business.configurations
@@ -8,8 +8,12 @@ namespace FinanceManager.Business.configurations
     {
         public TransactionMapperProfile()
         {
-            CreateMap<CsvImportRabo, Transaction>()
-                .ReverseMap();
+            CreateMap<Transaction, GetTransactionDTO>()
+                .IncludeAllDerived();
+
+            CreateMap<CreateTransactionDTO, Transaction>();
+
+            CreateMap<UpdateTransactionDTO, Transaction>();
         }
     }
 }
