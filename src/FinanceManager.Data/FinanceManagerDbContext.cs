@@ -1,19 +1,21 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using FinanceManager.Data.Entities;
+﻿using FinanceManager.Data.Entities;
 using FinanceManager.Data.Extensions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FinanceManager.Data
 {
-    public class FinanceManagerDbContext : DbContext
+    public class FinanceManagerDbContext : IdentityDbContext<User, Role, Guid>
     {
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Transaction> Transactions { get; set; }
-
 
         public FinanceManagerDbContext(DbContextOptions<FinanceManagerDbContext> options) : base(options)
         {
@@ -22,6 +24,45 @@ namespace FinanceManager.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            #region Authentication
+
+            modelBuilder.Entity<User>(b =>
+            {
+                b.ToTable("Users");
+            });
+
+            modelBuilder.Entity<IdentityUserClaim<Guid>>(b =>
+            {
+                b.ToTable("UserClaims");
+            });
+
+            modelBuilder.Entity<IdentityUserLogin<Guid>>(b =>
+            {
+                b.ToTable("UserLogins");
+            });
+
+            modelBuilder.Entity<IdentityUserToken<Guid>>(b =>
+            {
+                b.ToTable("UserTokens");
+            });
+
+            modelBuilder.Entity<Role>(b =>
+            {
+                b.ToTable("Roles");
+            });
+
+            modelBuilder.Entity<IdentityRoleClaim<Guid>>(b =>
+            {
+                b.ToTable("RoleClaims");
+            });
+
+            modelBuilder.Entity<IdentityUserRole<Guid>>(b =>
+            {
+                b.ToTable("UserRoles");
+            });
+
+            #endregion Authentication
 
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.ToAccount)

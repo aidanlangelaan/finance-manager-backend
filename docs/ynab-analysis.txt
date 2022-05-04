@@ -1,0 +1,82 @@
+YNAB research
+
+Account types
+=============
+Budget accounts (Accounts that you'll spend from in the near future (usually within the next year or two).)
+- checking
+- Savings
+- Credit Card
+- Line of Credit
+
+mortages and loans (Accounts that have an outstanding balance you're currently paying off, and aren't spending from.)
+- Mortgage
+- Auto Loan
+- Student Loan
+- Personal Loan
+- Medical Debt
+- Other Debt
+
+Tracking accounts (Accounts that hold money you don't plan to spend soon, such as investments or loans.)
+- Asset (e.g. Investment)
+- Liability (e.g. Mortgage)
+
+Categories
+==========
+5 main categories with smaller sub-categories
+- Immediate obligations
+* Rent/Mortgage
+* Electric
+* Water
+* Internet
+* Groceries
+* Transportation
+* Interest & Fees
+
+- True expenses
+* Auto Maintenance
+* Home Maintenance
+* Renter's/Home Insurance
+* Medical
+* Clothing
+* Gifts
+* Giving
+* Computer Replacement
+* Software Subscriptions
+* Stuff I Forgot to Budget For
+
+- Debt payments
+* Student Loan
+* Auto Loan
+
+- Quality of life goals
+* Vacation
+* Fitness
+* Education
+
+- Just for fun
+* Dining Out
+* Gaming
+* Music
+* Fun Money
+
+per sub-category the user can see
+* Cash Left Over From Last Month
+* Assigned This Month
+* Cash Spending
+* Credit Spending
+
+Budgets
+=======
+Create budgets per sub-category e.g. software subscriptions
+Set targets
+- Amount
+- Needed for (spending, savings balance, savings builder, debt payment)
+- Period (monthly, weekly, by date)
+- repeatable
+
+After importing data from bank accounts, the user can assign the available account amount to the budgets
+Assiging can be done manually (amount to a sub-category) or auto-assign based on previous month budgets
+
+Transactions
+============
+You can't see any imported transactions

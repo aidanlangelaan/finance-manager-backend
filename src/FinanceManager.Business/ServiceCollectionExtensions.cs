@@ -8,6 +8,7 @@ namespace FinanceManager.Business
     {
         public static IServiceCollection ConfigureApplicationServices(this IServiceCollection services)
         {
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IImportService, ImportService>();
