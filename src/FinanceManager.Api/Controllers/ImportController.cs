@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FinanceManager.Business.Interfaces;
+﻿using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Import;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FinanceManager.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ImportController : ControllerBase
     {
         private readonly IImportService _importService;
