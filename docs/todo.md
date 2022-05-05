@@ -4,10 +4,11 @@ These are things that still need doing or can be improved on.
 
 ## To do
 
-- Implement authentication on methods
-- Implement accesstoken refreshing
-- Remove password from registration
-- Implement registration confirmation
+- Implement authentication and authorization
+  - Implement authentication on methods
+  - Implement accesstoken refreshing
+  - Remove password from registration
+  - Implement registration confirmation
 - Check if transaction and accounts are unique when importing records.
 - Create all basic CRUD service and controller calls for Account, Transaction and Categories.
 
