@@ -98,9 +98,10 @@ namespace FinanceManager.Business.Services
             if (!await _roleManager.RoleExistsAsync(RoleConstants.User))
                 await _roleManager.CreateAsync(new Role(RoleConstants.User));
 
-            if (await _roleManager.RoleExistsAsync(RoleConstants.Admin))
+            // give all users the user role by default
+            if (await _roleManager.RoleExistsAsync(RoleConstants.User))
             {
-                await _userManager.AddToRoleAsync(user, RoleConstants.Admin);
+                await _userManager.AddToRoleAsync(user, RoleConstants.User);
             }
 
             return true;
