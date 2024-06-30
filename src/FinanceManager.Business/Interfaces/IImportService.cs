@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using FinanceManager.Business.Services.Import;
 using Microsoft.AspNetCore.Http;
 
-namespace FinanceManager.Business.Interfaces
+namespace FinanceManager.Business.Interfaces;
+
+public interface IImportService
 {
-    public interface IImportService
-    {
-        public Task<List<CsvImportResult>> ProcessImport(ICollection<IFormFile> files);
-    }
+    public Task<List<CsvImportResult>> ProcessImport(IEnumerable<IFormFile> files);
 }

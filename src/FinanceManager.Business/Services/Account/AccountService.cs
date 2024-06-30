@@ -1,15 +1,8 @@
 ﻿using FinanceManager.Business.Interfaces;
 using FinanceManager.Data;
 
-namespace FinanceManager.Business.Services
-{
-    public class AccountService : IAccountService
-    {
-        private readonly FinanceManagerDbContext _context;
+namespace FinanceManager.Business.Services;
 
-        public AccountService(FinanceManagerDbContext context)
-        {
-            _context = context;
-        }
-    }
+public class AccountService(FinanceManagerDbContext context) : IAccountService
+{
 }

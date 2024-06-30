@@ -3,22 +3,21 @@ using FluentValidation.AspNetCore;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceManager.Api.Utils.Interceptors
-{
-    public class FluentValidationInterceptor : IValidatorInterceptor
-    {
-        public ValidationResult AfterAspNetValidation(ActionContext actionContext, IValidationContext validationContext, ValidationResult result)
-        {
-            if (!result.IsValid)
-            {
-                actionContext.HttpContext.Items.Add("ValidationResult", result);
-            }
-            return result;
-        }
+namespace FinanceManager.Api.Utils.Interceptors;
 
-        public IValidationContext BeforeAspNetValidation(ActionContext actionContext, IValidationContext commonContext)
+public class FluentValidationInterceptor : IValidatorInterceptor
+{
+    public ValidationResult AfterAspNetValidation(ActionContext actionContext, IValidationContext validationContext, ValidationResult result)
+    {
+        if (!result.IsValid)
         {
-            return commonContext;
+            actionContext.HttpContext.Items.Add("ValidationResult", result);
         }
+        return result;
+    }
+
+    public IValidationContext BeforeAspNetValidation(ActionContext actionContext, IValidationContext commonContext)
+    {
+        return commonContext;
     }
 }

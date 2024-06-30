@@ -1,14 +1,12 @@
-﻿using System;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace FinanceManager.Api.Models
+namespace FinanceManager.Api.Models;
+
+public class LoginUserViewModelValidator : AbstractValidator<LoginUserViewModel>
 {
-    public class LoginUserViewModelValidator : AbstractValidator<LoginUserViewModel>
+    public LoginUserViewModelValidator()
     {
-        public LoginUserViewModelValidator()
-        {
-            RuleFor(login => login.EmailAddress).NotEmpty();
-            RuleFor(login => login.Password).NotEmpty();
-        }
+        RuleFor(login => login.EmailAddress).NotEmpty();
+        RuleFor(login => login.Password).NotEmpty();
     }
 }

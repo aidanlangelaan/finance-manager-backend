@@ -1,7 +1,6 @@
-﻿namespace FinanceManager.Data.Constants
+﻿namespace FinanceManager.Data.Constants;
+
+public static class CategoryConstants
 {
-    public static class CategoryConstants
-    {
-        public const int UncategorizedId = 1;
-    }
+    public const int UncategorizedId = 1;
 }

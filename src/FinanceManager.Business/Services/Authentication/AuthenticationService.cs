@@ -9,102 +9,95 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinanceManager.Business.Services
+namespace FinanceManager.Business.Services;
+
+public class AuthenticationService(
+    FinanceManagerDbContext context,
+    IMapper mapper,
+    IConfiguration configuration,
+    UserManager<User> userManager,
+    RoleManager<Role> roleManager)
+    : IAuthenticationService
 {
-    public class AuthenticationService : IAuthenticationService
+    public async Task<JwtSecurityToken> LoginUser(LoginUserDTO model)
     {
-        private readonly FinanceManagerDbContext _context;
-        private readonly IMapper _mapper;
-        private readonly IConfiguration _configuration;
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
-
-        public AuthenticationService(FinanceManagerDbContext context, IMapper mapper, IConfiguration configuration, UserManager<User> userManager, RoleManager<Role> roleManager)
+        var user = await userManager.FindByEmailAsync(model.EmailAddress);
+        if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
         {
-            _context = context;
-            _mapper = mapper;
-            _configuration = configuration;
-            _userManager = userManager;
-            _roleManager = roleManager;
+            return null;
         }
 
-        public async Task<JwtSecurityToken> LoginUser(LoginUserDTO model)
+        var issuingOnAt = DateTime.UtcNow;
+        var expiringOnAt = issuingOnAt.AddHours(3);
+
+        var authClaims = new List<Claim>
         {
-            var user = await _userManager.FindByEmailAsync(model.EmailAddress);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                return null;
-            }
+            new(JwtRegisteredClaimNames.Sub,
+                user.UserName ?? throw new InvalidOperationException("Username can't be empty")),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Iat, issuingOnAt.ToString(CultureInfo.InvariantCulture)),
+            new(JwtRegisteredClaimNames.Exp, issuingOnAt.ToString(CultureInfo.InvariantCulture)),
+        };
 
-            var issuingOnAt = DateTime.UtcNow;
-            var expiringOnAt = issuingOnAt.AddHours(3);
+        var userRoles = await userManager.GetRolesAsync(user);
+        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
 
-            var authClaims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, issuingOnAt.ToString()),
-                new Claim(JwtRegisteredClaimNames.Exp, issuingOnAt.ToString()),
-            };
+        var authSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(configuration["Authentication:Secret"] ??
+                                   throw new InvalidOperationException("Secret can't be empty")));
+        
+        var token = new JwtSecurityToken(
+            issuer: configuration["Authentication:ValidIssuer"],
+            audience: configuration["Authentication:ValidAudience"],
+            expires: expiringOnAt,
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        );
 
-            var userRoles = await _userManager.GetRolesAsync(user);
-            foreach (var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            }
+        return token;
+    }
 
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:Secret"]));
-            var token = new JwtSecurityToken(
-                    issuer: _configuration["Authentication:ValidIssuer"],
-                    audience: _configuration["Authentication:ValidAudience"],
-                    expires: expiringOnAt,
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
-
-            return token;
+    public async Task<bool> RegisterUser(RegisterUserDTO model)
+    {
+        var existingUser = await userManager.FindByEmailAsync(model.EmailAddress);
+        if (existingUser != null)
+        {
+            return false;
         }
 
-        public async Task<bool> RegisterUser(RegisterUserDTO model)
+        var user = new User()
         {
-            var existingUser = await _userManager.FindByEmailAsync(model.EmailAddress);
-            if (existingUser != null)
-            {
-                return false;
-            }
+            Email = model.EmailAddress,
+            SecurityStamp = Guid.NewGuid().ToString(),
+            UserName = model.EmailAddress,
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+        };
 
-            User user = new User()
-            {
-                Email = model.EmailAddress,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.EmailAddress,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                return false;
-            }
-
-            if (!await _roleManager.RoleExistsAsync(RoleConstants.Admin))
-                await _roleManager.CreateAsync(new Role(RoleConstants.Admin));
-            if (!await _roleManager.RoleExistsAsync(RoleConstants.User))
-                await _roleManager.CreateAsync(new Role(RoleConstants.User));
-
-            // give all users the user role by default
-            if (await _roleManager.RoleExistsAsync(RoleConstants.User))
-            {
-                await _userManager.AddToRoleAsync(user, RoleConstants.User);
-            }
-
-            return true;
+        var result = await userManager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            return false;
         }
+
+        if (!await roleManager.RoleExistsAsync(RoleConstants.Admin))
+            await roleManager.CreateAsync(new Role(RoleConstants.Admin));
+        if (!await roleManager.RoleExistsAsync(RoleConstants.User))
+            await roleManager.CreateAsync(new Role(RoleConstants.User));
+
+        // give all users the user role by default
+        if (await roleManager.RoleExistsAsync(RoleConstants.User))
+        {
+            await userManager.AddToRoleAsync(user, RoleConstants.User);
+        }
+
+        return true;
     }
 }

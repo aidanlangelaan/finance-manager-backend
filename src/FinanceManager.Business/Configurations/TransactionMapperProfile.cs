@@ -2,18 +2,17 @@
 using FinanceManager.Business.Services.Models;
 using FinanceManager.Data.Entities;
 
-namespace FinanceManager.Business.configurations
+namespace FinanceManager.Business.configurations;
+
+public class TransactionMapperProfile : Profile
 {
-    public class TransactionMapperProfile : Profile
+    public TransactionMapperProfile()
     {
-        public TransactionMapperProfile()
-        {
-            CreateMap<Transaction, GetTransactionDTO>()
-                .IncludeAllDerived();
+        CreateMap<Transaction, GetTransactionDTO>()
+            .IncludeAllDerived();
 
-            CreateMap<CreateTransactionDTO, Transaction>();
+        CreateMap<CreateTransactionDTO, Transaction>();
 
-            CreateMap<UpdateTransactionDTO, Transaction>();
-        }
+        CreateMap<UpdateTransactionDTO, Transaction>();
     }
 }

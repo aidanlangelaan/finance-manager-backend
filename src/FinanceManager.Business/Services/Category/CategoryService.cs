@@ -1,15 +1,8 @@
 ﻿using FinanceManager.Business.Interfaces;
 using FinanceManager.Data;
 
-namespace FinanceManager.Business.Services
-{
-    public class CategoryService : ICategoryService
-    {
-        private readonly FinanceManagerDbContext _context;
+namespace FinanceManager.Business.Services;
 
-        public CategoryService(FinanceManagerDbContext context)
-        {
-            _context = context;
-        }
-    }
+public class CategoryService(FinanceManagerDbContext context) : ICategoryService
+{
 }

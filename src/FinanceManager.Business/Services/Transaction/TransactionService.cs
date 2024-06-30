@@ -7,58 +7,48 @@ using FinanceManager.Data;
 using FinanceManager.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace FinanceManager.Business.Services
+namespace FinanceManager.Business.Services;
+
+public class TransactionService(FinanceManagerDbContext context, IMapper mapper) : ITransactionService
 {
-    public class TransactionService : ITransactionService
+    public async Task<List<GetTransactionDTO>> GetAll()
     {
-        private readonly FinanceManagerDbContext _context;
-        private readonly IMapper _mapper;
+        var transactions = await context.Transactions.ToListAsync();
+        return mapper.Map<List<GetTransactionDTO>>(transactions);
+    }
 
-        public TransactionService(FinanceManagerDbContext context, IMapper mapper)
+    public async Task<GetTransactionDTO> GetById(int id)
+    {
+        var transaction = await context.Transactions.FirstOrDefaultAsync(t => t.Id == id);
+        return mapper.Map<GetTransactionDTO>(transaction);
+    }
+
+    public async Task<GetTransactionDTO> Create(CreateTransactionDTO model)
+    {
+        var transaction = mapper.Map<Transaction>(model);
+        var addTransaction = await context.Transactions.AddAsync(transaction);
+        await context.SaveChangesAsync();
+        return mapper.Map<GetTransactionDTO>(addTransaction.Entity);
+    }
+
+    public async Task Update(UpdateTransactionDTO model)
+    {
+        var transaction = await context.Transactions.FirstOrDefaultAsync(t => t.Id == model.Id);
+        if (transaction != null)
         {
-            _context = context;
-            _mapper = mapper;
+            transaction = mapper.Map(model, transaction);
+            context.Transactions.Update(transaction);
+            await context.SaveChangesAsync();
         }
+    }
 
-        public async Task<List<GetTransactionDTO>> GetAll()
+    public async Task Delete(int id)
+    {
+        var transaction = await context.Transactions.FirstOrDefaultAsync(t => t.Id == id);
+        if (transaction != null)
         {
-            var transactions = await _context.Transactions.ToListAsync();
-            return _mapper.Map<List<GetTransactionDTO>>(transactions);
-        }
-
-        public async Task<GetTransactionDTO> GetById(int id)
-        {
-            var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == id);
-            return _mapper.Map<GetTransactionDTO>(transaction);
-        }
-
-        public async Task<GetTransactionDTO> Create(CreateTransactionDTO model)
-        {
-            var transaction = _mapper.Map<Transaction>(model);
-            var addTransaction = await _context.Transactions.AddAsync(transaction);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<GetTransactionDTO>(addTransaction.Entity);
-        }
-
-        public async Task Update(UpdateTransactionDTO model)
-        {
-            var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == model.Id);
-            if (transaction != null)
-            {
-                transaction = _mapper.Map(model, transaction);
-                _context.Transactions.Update(transaction);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task Delete(int id)
-        {
-            var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == id);
-            if (transaction != null)
-            {
-                _context.Transactions.Remove(transaction);
-                await _context.SaveChangesAsync();
-            }
+            context.Transactions.Remove(transaction);
+            await context.SaveChangesAsync();
         }
     }
 }

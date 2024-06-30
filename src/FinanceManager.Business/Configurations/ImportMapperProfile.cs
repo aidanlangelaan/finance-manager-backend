@@ -2,14 +2,13 @@
 using FinanceManager.Business.Services.Import;
 using FinanceManager.Data.Entities;
 
-namespace FinanceManager.Business.configurations
+namespace FinanceManager.Business.configurations;
+
+public class ImportMapperProfile : Profile
 {
-    public class ImportMapperProfile : Profile
+    public ImportMapperProfile()
     {
-        public ImportMapperProfile()
-        {
-            CreateMap<CsvImportRabo, Transaction>()
-                .ReverseMap();
-        }
+        CreateMap<CsvImportRabo, Transaction>()
+            .ReverseMap();
     }
 }

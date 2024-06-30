@@ -15,133 +15,121 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace FinanceManager.Business.Services
+namespace FinanceManager.Business.Services;
+
+public class ImportService(FinanceManagerDbContext context, ILogger<ImportService> logger, IMapperBase mapper)
+    : IImportService
 {
-    public class ImportService : IImportService
+    public async Task<List<CsvImportResult>> ProcessImport(IEnumerable<IFormFile> files)
     {
-        private readonly FinanceManagerDbContext _context;
-        private readonly ILogger<ImportService> _logger;
-        private readonly IMapper _mapper;
-
-        public ImportService(FinanceManagerDbContext context, ILogger<ImportService> logger, IMapper mapper)
+        List<CsvImportResult> results = [];
+        foreach (var file in files)
         {
-            _context = context;
-            _logger = logger;
-            _mapper = mapper;
+            var result = await ProcessFile(file);
+            result.FileName = file.FileName;
+            results.Add(result);
         }
 
-        public async Task<List<CsvImportResult>> ProcessImport(ICollection<IFormFile> files)
+        return results;
+    }
+
+    private async Task<CsvImportResult> ProcessFile(IFormFile file)
+    {
+        CsvImportResult result = null;
+        var readerConfig = new CsvConfiguration(new CultureInfo("nl-NL"))
         {
-            var results = new List<CsvImportResult>();
-            foreach (var file in files)
+            Delimiter = ","
+        };
+
+        using var reader = new StreamReader(file.OpenReadStream());
+        using var csv = new CsvReader(reader, readerConfig);
+
+        try
+        {
+            var records = csv.GetRecords<CsvImportRabo>().ToList();
+            if (records.Count > 0)
             {
-                var result = await ProcessFile(file);
-                result.FileName = file.FileName;
-                results.Add(result);
+                result = await ProcessRecords(records);
             }
-            return results;
+        }
+        catch (BadDataException)
+        {
+            logger.LogError("Failed to process imported file");
+            result = new CsvImportResult();
         }
 
-        private async Task<CsvImportResult> ProcessFile(IFormFile file)
-        {
-            CsvImportResult result = null;
-            var readerConfig = new CsvConfiguration(new CultureInfo("nl-NL"));
-            readerConfig.Delimiter = ",";
+        return result;
+    }
 
-            using (var reader = new StreamReader(file.OpenReadStream()))
-            using (var csv = new CsvReader(reader, readerConfig))
+    private async Task<CsvImportResult> ProcessRecords(List<CsvImportRabo> records)
+    {
+        CsvImportResult result = new();
+        foreach (var record in records)
+        {
+            try
             {
-                try
+                var account = await GetFromAccount(record);
+                var counterpartyAccount = await GetCounterPartyAccount(record);
+
+                var transaction = mapper.Map<Transaction>(record);
+                if (transaction.Amount < 0)
                 {
-                    var records = csv.GetRecords<CsvImportRabo>().ToList();
-                    if (records.Count > 0)
-                    {
-                        result = await ProcessRecords(records);
-                    }
+                    transaction.ToAccount = counterpartyAccount;
+                    transaction.FromAccount = account;
                 }
-                catch (BadDataException badDataException)
+                else
                 {
-                    _logger.LogError("Failed to process imported file", badDataException.ToString());
-                    result = new CsvImportResult();
+                    transaction.ToAccount = account;
+                    transaction.FromAccount = counterpartyAccount;
                 }
+
+                context.Transactions.Add(transaction);
+                await context.SaveChangesAsync();
+
+                result.Imported += 1;
             }
-
-            return result;
-        }
-
-        private async Task<CsvImportResult> ProcessRecords(List<CsvImportRabo> records)
-        {
-            var result = new CsvImportResult();
-
-            foreach (var record in records)
+            catch (Exception)
             {
-                try
-                {
-                    Account account = await GetFromAccount(record);
-                    Account counterpartyAccount = await GetCounterPartyAccount(record);
-
-                    var transaction = _mapper.Map<Transaction>(record);
-                    if (transaction.Amount < 0)
-                    {
-                        transaction.ToAccount = counterpartyAccount;
-                        transaction.FromAccount = account;
-                    }
-                    else
-                    {
-                        transaction.ToAccount = account;
-                        transaction.FromAccount = counterpartyAccount;
-                    }
-
-                    _context.Transactions.Add(transaction);
-                    await _context.SaveChangesAsync();
-
-                    result.Imported += 1;
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError("Failed to process record", e.ToString());
-                    result.Failed.Add(record);
-                }
+                logger.LogError("Failed to process record");
+                result.Failed.Add(record);
             }
-
-            return result;
         }
 
-        private async Task<Account> GetCounterPartyAccount(CsvImportRabo record)
+        return result;
+    }
+
+    private async Task<Account> GetCounterPartyAccount(CsvImportRabo record)
+    {
+        var counterpartyAccount = await context.Accounts
+            .FirstOrDefaultAsync(acc => (!string.IsNullOrEmpty(acc.Iban) && acc.Iban == record.CounterpartyIban) ||
+                                        acc.Name.Equals(record.CounterpartyName,
+                                            StringComparison.CurrentCultureIgnoreCase));
+        if (counterpartyAccount != null) return counterpartyAccount;
+
+        counterpartyAccount = new Account()
         {
-            var counterpartyAccount = await _context.Accounts
-                                    .FirstOrDefaultAsync(a => (!string.IsNullOrEmpty(a.Iban) && a.Iban == record.CounterpartyIban) ||
-                                        a.Name.ToLower() == record.CounterpartyName.ToLower());
-            if (counterpartyAccount == null)
-            {
-                counterpartyAccount = new Account()
-                {
-                    Iban = record.CounterpartyIban,
-                    Name = record.CounterpartyName
-                };
-                _context.Accounts.Add(counterpartyAccount);
-            }
+            Iban = record.CounterpartyIban,
+            Name = record.CounterpartyName
+        };
+        context.Accounts.Add(counterpartyAccount);
 
-            return counterpartyAccount;
-        }
+        return counterpartyAccount;
+    }
 
-        private async Task<Account> GetFromAccount(CsvImportRabo record)
+    private async Task<Account> GetFromAccount(CsvImportRabo record)
+    {
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(acc =>
+                acc.Iban.Equals(record.Iban, StringComparison.CurrentCultureIgnoreCase));
+        if (account != null) return account;
+            
+        account = new Account()
         {
-            var account = await _context.Accounts
-                                    .FirstOrDefaultAsync(a =>
-                                        a.Iban == record.Iban);
-            if (account == null)
-            {
-                account = new Account()
-                {
-                    Iban = record.Iban,
-                    Name = String.Empty
-                };
+            Iban = record.Iban,
+            Name = string.Empty
+        };
+        context.Accounts.Add(account);
 
-                _context.Accounts.Add(account);
-            }
-
-            return account;
-        }
+        return account;
     }
 }

@@ -2,22 +2,21 @@
 using FinanceManager.Api.Models;
 using FinanceManager.Business.Services.Models;
 
-namespace FinanceManager.Api.Configurations
+namespace FinanceManager.Api.Configurations;
+
+public class TransactionViewModelMapperProfile : Profile
 {
-    public class TransactionViewModelMapperProfile : Profile
+    public TransactionViewModelMapperProfile()
     {
-        public TransactionViewModelMapperProfile()
-        {
-            CreateViewModelMapping();
-        }
+        CreateViewModelMapping();
+    }
 
-        private void CreateViewModelMapping()
-        {
-            CreateMap<GetTransactionDTO, GetTransactionViewModel>();
+    private void CreateViewModelMapping()
+    {
+        CreateMap<GetTransactionDTO, GetTransactionViewModel>();
 
-            CreateMap<CreateTransactionViewModel, CreateTransactionDTO>();
+        CreateMap<CreateTransactionViewModel, CreateTransactionDTO>();
 
-            CreateMap<UpdateTransactionViewModel, UpdateTransactionDTO>();
-        }
+        CreateMap<UpdateTransactionViewModel, UpdateTransactionDTO>();
     }
 }

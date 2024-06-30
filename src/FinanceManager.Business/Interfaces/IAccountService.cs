@@ -1,7 +1,5 @@
-﻿namespace FinanceManager.Business.Interfaces
-{
-    public interface IAccountService
-    {
+﻿namespace FinanceManager.Business.Interfaces;
 
-    }
+public interface IAccountService
+{
 }

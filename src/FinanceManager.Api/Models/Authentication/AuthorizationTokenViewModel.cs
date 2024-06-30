@@ -1,16 +1,10 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
-namespace FinanceManager.Api.Models
+namespace FinanceManager.Api.Models;
+
+public class AuthorizationTokenViewModel(SecurityToken token)
 {
-    public class AuthorizationTokenViewModel
-    {
-        public AuthorizationTokenViewModel(JwtSecurityToken token)
-        {
-            AccessToken = new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-    }
+    public string AccessToken { get; init; } = new JwtSecurityTokenHandler().WriteToken(token);
+    public string RefreshToken { get; init; }
 }

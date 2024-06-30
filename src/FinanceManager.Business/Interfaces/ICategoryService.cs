@@ -1,7 +1,5 @@
-﻿namespace FinanceManager.Business.Interfaces
-{
-    public interface ICategoryService
-    {
+﻿namespace FinanceManager.Business.Interfaces;
 
-    }
+public interface ICategoryService
+{
 }

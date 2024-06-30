@@ -1,9 +1,8 @@
-﻿namespace FinanceManager.Business.Services.Models
-{
-    public class LoginUserDTO
-    {
-        public string EmailAddress { get; set; }
+﻿namespace FinanceManager.Business.Services.Models;
 
-        public string Password { get; set; }
-    }
+public class LoginUserDTO
+{
+    public string EmailAddress { get; init; }
+
+    public string Password { get; init; }
 }

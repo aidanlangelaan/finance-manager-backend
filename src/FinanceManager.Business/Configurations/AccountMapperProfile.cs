@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 
-namespace FinanceManager.Business.configurations
+namespace FinanceManager.Business.configurations;
+
+public class AccountMapperProfile : Profile
 {
-    public class AccountMapperProfile : Profile
-    {
-    }
 }

@@ -1,16 +1,14 @@
-﻿using System;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace FinanceManager.Api.Models
+namespace FinanceManager.Api.Models;
+
+public class RegisterUserViewModelValidator : AbstractValidator<RegisterUserViewModel>
 {
-    public class RegisterUserViewModelValidator : AbstractValidator<RegisterUserViewModel>
+    public RegisterUserViewModelValidator()
     {
-        public RegisterUserViewModelValidator()
-        {
-            RuleFor(register => register.FirstName).NotEmpty();
-            RuleFor(register => register.LastName).NotEmpty();
-            RuleFor(register => register.EmailAddress).NotEmpty();
-            RuleFor(register => register.Password).NotEmpty();
-        }
+        RuleFor(register => register.FirstName).NotEmpty();
+        RuleFor(register => register.LastName).NotEmpty();
+        RuleFor(register => register.EmailAddress).NotEmpty();
+        RuleFor(register => register.Password).NotEmpty();
     }
 }

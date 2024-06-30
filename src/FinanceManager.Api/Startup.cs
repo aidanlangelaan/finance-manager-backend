@@ -17,26 +17,21 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace FinanceManager.Api
+namespace FinanceManager.Api;
+
+public class Startup(IConfiguration configuration)
 {
-    public class Startup
+    private IConfiguration Configuration { get; } = configuration;
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        // Setup dependency injection
+        services.ConfigureDataServices(Configuration["ConnectionStrings:FinanceManagerContext"])
+            .ConfigureApplicationServices();
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // Setup dependency injection
-            services.ConfigureDataServices(Configuration["ConnectionStrings:FinanceManagerContext"])
-                .ConfigureApplicationServices();
-
-            // Adding Authentication  
-            services.AddAuthentication(options =>
+        // Adding Authentication  
+        services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,107 +49,103 @@ namespace FinanceManager.Api
                     ValidateIssuer = true,
                     ValidIssuer = Configuration["Authentication:ValidIssuer"],
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Authentication:Secret"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                        Configuration["Authentication:Secret"] ??
+                        throw new InvalidOperationException("Secret can't be empty"))),
                     ValidateLifetime = true,
                     LifetimeValidator = TokenLifetimeValidator.Validate
                 };
             });
 
-            services.AddControllers();
+        services.AddControllers();
 
-            services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
+        services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
 
-            services.Configure<IISServerOptions>(options =>
-            {
-                options.AutomaticAuthentication = false;
-            });
+        services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
-            services.SetupFluentValidation();
+        services.SetupFluentValidation();
 
-            services.AddAutoMapper(typeof(TransactionViewModelMapperProfile), typeof(TransactionMapperProfile));
+        services.AddAutoMapper(typeof(TransactionViewModelMapperProfile), typeof(TransactionMapperProfile));
 
-            AddSwagger(services);
+        AddSwagger(services);
+    }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseCors(options => options.AllowAnyMethod()
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .Build());
+        }
+        else
+        {
+            app.UseHsts();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
+        app.UseSwagger();
+            
+        app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Finance Manager - API"); });
+    }
+
+    private static void AddSwagger(IServiceCollection services)
+    {
+        services.AddSwaggerGen(options =>
         {
-            if (env.IsDevelopment())
+            options.SwaggerDoc("v1", new OpenApiInfo
             {
-                app.UseDeveloperExceptionPage();
-                app.UseCors(options => options.AllowAnyMethod()
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .Build());
-            }
-            else
-            {
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
+                Version = "v1",
+                Title = "Finance Manager - API",
+                Description = "Web API for registering and displaying financial data.",
+                Contact = new OpenApiContact
+                {
+                    Name = "Aidan Langelaan",
+                    Email = "aidan@langelaan.pro",
+                    Url = new Uri("https://twitter.com/aidanlangelaan")
+                },
             });
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Finance Manager API");
+                Name = "Authorization",
+                Description = "JWT Authorization header using the Bearer scheme.",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT"
             });
-        }
 
-        private static void AddSwagger(IServiceCollection services)
-        {
-            services.AddSwaggerGen(options =>
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
-                options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Version = "v1",
-                    Title = "Finance Manager API",
-                    Description = "Web API for registering and displaying financial data.",
-                    Contact = new OpenApiContact
+                    new OpenApiSecurityScheme
                     {
-                        Name = "Aidan Langelaan",
-                        Email = "aidan@langelaan.pro",
-                        Url = new Uri("https://twitter.com/aidanlangelaan")
-                    },
-                });
-
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Description = "JWT Authorization header using the Bearer scheme.",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT"
-                });
-
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
+                        Reference = new OpenApiReference
                         {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "Bearer",
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        }, new List<string>()
-                    }
-                });
-
-                // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                options.IncludeXmlComments(xmlPath);
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        }
+                    },
+                    new List<string>()
+                }
             });
-        }
+
+            // Set the comments path for the Swagger JSON and UI.
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        });
     }
 }
