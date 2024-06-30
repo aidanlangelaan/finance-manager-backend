@@ -7,12 +7,10 @@ namespace FinanceManager.Api.Models
     {
         public AuthorizationTokenViewModel(JwtSecurityToken token)
         {
-            Token = new JwtSecurityTokenHandler().WriteToken(token);
-            Expiration = token.ValidTo;
+            AccessToken = new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string Token { get; set; }
-
-        public DateTime Expiration { get; set; }
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
     }
 }

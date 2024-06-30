@@ -78,7 +78,7 @@ namespace FinanceManager.Data
         }
 
         /// <summary>
-		/// Asynchroniously save the changes
+		/// Asynchronously save the changes
 		/// </summary>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
