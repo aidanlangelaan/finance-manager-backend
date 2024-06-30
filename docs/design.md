@@ -28,9 +28,13 @@ Category
 - id : PK
 - description
 
-## thoughts
+## Thoughts
 
 These are design issues i'm still thinking on or am not sure about yet.
+
+### Importing transactions
+
+Currently after uploading a rabo CSV transaction file, they are processed directly. This means that the request stays active (and potentially times-out) until the import has finished. A better way would be to park the file in some sort of file storage and have a worker handle the import. This way the user can continue using the application while the import is being processed. 
 
 ### Duplicate transactions
 
@@ -43,18 +47,21 @@ I therefore think I will need to implement some kind of hash comparision:
 
 ### Rabobank
 
-- Currently only support Rabobank csv files, need to get examples of ING of ABN so I can also process those.
+- #### CSV support
 
-- #### Moet ik balans bij rekening opnemen?
+  Currently only support Rabobank csv files, need to get examples of ING of ABN so I can also process those.
 
-  nee, start balans wordt een losse transactie. Dit betekent wel dat je niet al te veel kan rommelen met transacties van voordat je de start balans ingesteld hebt. Dit heeft namelijk gevolgen voor de geschiedenis van een rekening.
+- #### Should I include a balance property in an account?
 
-- #### Moet currency bij een transactie opgenomen worden?
+  no, start balance will be a separate transaction. This does mean that you cannot mess around too much with transactions from before you set the starting balance. This has consequences for the history of an account.
+
+- #### Should currency be included in a transaction?
+  
   Yes, but this can be added at a later stage. In first instance there is no need for supporting multiple currencies.
 
 ### Account types
 
-I've now got 3 basic types, where the last type is questionable. This issue now tho is should I perhaps add sub-account types? For example, with expense accounts you could then also track loans or debts. Or should I use categories for that instead?
+I've now got 3 basic types, where the last type is questionable. This issue now though is should I perhaps add sub-account types? For example, with expense accounts you could then also track loans or debts. Or should I use categories for that instead?
 
 - #### Asset accounts
 
@@ -65,4 +72,4 @@ I've now got 3 basic types, where the last type is questionable. This issue now 
   These are accounts the user has payed into. So as in the previous example, the account of the grocery store. This way we can also track the amount spent at a specific store for a specific period.
 
 - #### Savings accounts
-  I'm not sure yet on if it's usefull for having a specific type for savings. Should this include only users savings accounts, or also others such as pension / share accounts?
+  I'm not sure yet on if it's useful for having a specific type for savings. Should this include only users savings accounts, or also others such as pension / share accounts?
