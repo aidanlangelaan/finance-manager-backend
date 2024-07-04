@@ -16,6 +16,6 @@ public class UserToken : IdentityUserToken<Guid>
     public string LastName { get; set; }
 
     [Required]
-    [Column(TypeName = "datetime2(7)")]
+    [Column(TypeName = "datetime")]
     public DateTime RegisteredOnAt { get; set; } = DateTime.UtcNow;
 }

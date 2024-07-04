@@ -20,7 +20,7 @@ public class Transaction : AuditableEntity
     public int ToAccountId { get; set; }
 
     [Required]
-    [Column(TypeName = "datetime2(7)")]
+    [Column(TypeName = "datetime")]
     public DateTime Date { get; set; }
 
     [Column(TypeName = "varchar(255)")]

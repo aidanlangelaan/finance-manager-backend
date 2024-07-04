@@ -6,9 +6,11 @@ namespace FinanceManager.Data.Entities;
 
 public abstract class EntityBase
 {
+    [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; }
+    [ConcurrencyCheck]
+    [Column(TypeName = "datetime")]
+    public DateTime RowVersion { get; set; }
 }

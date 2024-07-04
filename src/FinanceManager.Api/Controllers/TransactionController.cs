@@ -14,7 +14,7 @@ namespace FinanceManager.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class TransactionController(ITransactionService transactionService, IMapperBase mapper) : ControllerBase
+public class TransactionController(ITransactionService transactionService, IMapper mapper) : ControllerBase
 {
     /// <summary>
     /// Gets all transactions

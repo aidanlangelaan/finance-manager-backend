@@ -13,7 +13,7 @@ namespace FinanceManager.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [AllowAnonymous]
-public class AuthenticationController(IAuthenticationService authenticationService, IMapperBase mapper)
+public class AuthenticationController(IAuthenticationService authenticationService, IMapper mapper)
     : ControllerBase
 {
     /// <summary>
