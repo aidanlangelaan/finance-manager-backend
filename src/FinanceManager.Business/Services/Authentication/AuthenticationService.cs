@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using FinanceManager.Business.Interfaces;
+﻿using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Models;
-using FinanceManager.Data;
 using FinanceManager.Data.Constants;
 using FinanceManager.Data.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -9,8 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,15 +28,15 @@ public class AuthenticationService(
             return null;
         }
 
-        var issuingOnAt = DateTime.UtcNow;
+        var issuingOnAt = DateTimeOffset.UtcNow;
         var expiringOnAt = issuingOnAt.AddHours(3);
 
         var authClaims = new Dictionary<string, object>
         {
             [JwtRegisteredClaimNames.Sub] = user.UserName ?? throw new InvalidOperationException("Username can't be empty"),
             [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
-            [JwtRegisteredClaimNames.Iat] = issuingOnAt.ToString(CultureInfo.InvariantCulture),
-            [JwtRegisteredClaimNames.Exp] = issuingOnAt.ToString(CultureInfo.InvariantCulture),
+            [JwtRegisteredClaimNames.Iat] = issuingOnAt.ToUnixTimeSeconds().ToString(),
+            [JwtRegisteredClaimNames.Exp] = expiringOnAt.ToUnixTimeSeconds().ToString()
         };
 
         var userRoles = await userManager.GetRolesAsync(user);
@@ -57,7 +53,7 @@ public class AuthenticationService(
         {
             Issuer = configuration["Authentication:ValidIssuer"],
             Audience = configuration["Authentication:ValidAudience"],
-            Expires = expiringOnAt,
+            Expires = expiringOnAt.UtcDateTime,
             Claims = authClaims,
             SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         };
