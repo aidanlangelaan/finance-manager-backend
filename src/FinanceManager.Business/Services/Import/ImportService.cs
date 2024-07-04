@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FinanceManager.Business.Services;
 
-public class ImportService(FinanceManagerDbContext context, ILogger<ImportService> logger, IMapperBase mapper)
+public class ImportService(FinanceManagerDbContext context, ILogger<ImportService> logger, IMapper mapper)
     : IImportService
 {
     public async Task<List<CsvImportResult>> ProcessImport(IEnumerable<IFormFile> files)
@@ -52,9 +52,9 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
                 result = await ProcessRecords(records);
             }
         }
-        catch (BadDataException)
+        catch (BadDataException exception)
         {
-            logger.LogError("Failed to process imported file");
+            logger.LogError(exception, "Failed to process imported file");
             result = new CsvImportResult();
         }
 
@@ -83,14 +83,14 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
                     transaction.FromAccount = counterpartyAccount;
                 }
 
-                context.Transactions.Add(transaction);
+                await context.Transactions.AddAsync(transaction);
                 await context.SaveChangesAsync();
 
                 result.Imported += 1;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                logger.LogError("Failed to process record");
+                logger.LogError(exception, "Failed to process record");
                 result.Failed.Add(record);
             }
         }
@@ -111,7 +111,7 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
             Iban = record.CounterpartyIban,
             Name = record.CounterpartyName
         };
-        context.Accounts.Add(counterpartyAccount);
+        await context.Accounts.AddAsync(counterpartyAccount);
 
         return counterpartyAccount;
     }
@@ -128,7 +128,7 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
             Iban = record.Iban,
             Name = string.Empty
         };
-        context.Accounts.Add(account);
+        await context.Accounts.AddAsync(account);
 
         return account;
     }

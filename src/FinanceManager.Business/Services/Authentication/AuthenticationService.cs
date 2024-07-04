@@ -10,23 +10,21 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace FinanceManager.Business.Services;
 
 public class AuthenticationService(
-    FinanceManagerDbContext context,
-    IMapper mapper,
     IConfiguration configuration,
     UserManager<User> userManager,
     RoleManager<Role> roleManager)
     : IAuthenticationService
 {
-    public async Task<JwtSecurityToken> LoginUser(LoginUserDTO model)
+    public async Task<string> LoginUser(LoginUserDTO model)
     {
         var user = await userManager.FindByEmailAsync(model.EmailAddress);
         if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
@@ -37,31 +35,39 @@ public class AuthenticationService(
         var issuingOnAt = DateTime.UtcNow;
         var expiringOnAt = issuingOnAt.AddHours(3);
 
-        var authClaims = new List<Claim>
+        var authClaims = new Dictionary<string, object>
         {
-            new(JwtRegisteredClaimNames.Sub,
-                user.UserName ?? throw new InvalidOperationException("Username can't be empty")),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Iat, issuingOnAt.ToString(CultureInfo.InvariantCulture)),
-            new(JwtRegisteredClaimNames.Exp, issuingOnAt.ToString(CultureInfo.InvariantCulture)),
+            [JwtRegisteredClaimNames.Sub] = user.UserName ?? throw new InvalidOperationException("Username can't be empty"),
+            [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
+            [JwtRegisteredClaimNames.Iat] = issuingOnAt.ToString(CultureInfo.InvariantCulture),
+            [JwtRegisteredClaimNames.Exp] = issuingOnAt.ToString(CultureInfo.InvariantCulture),
         };
 
         var userRoles = await userManager.GetRolesAsync(user);
-        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+        foreach (var role in userRoles)
+        {
+            authClaims.Add(ClaimTypes.Role, role);   
+        }
 
         var authSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(configuration["Authentication:Secret"] ??
                                    throw new InvalidOperationException("Secret can't be empty")));
-        
-        var token = new JwtSecurityToken(
-            issuer: configuration["Authentication:ValidIssuer"],
-            audience: configuration["Authentication:ValidAudience"],
-            expires: expiringOnAt,
-            claims: authClaims,
-            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-        );
 
-        return token;
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = configuration["Authentication:ValidIssuer"],
+            Audience = configuration["Authentication:ValidAudience"],
+            Expires = expiringOnAt,
+            Claims = authClaims,
+            SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        };
+
+        var handler = new JsonWebTokenHandler
+        {
+            SetDefaultTimesOnTokenCreation = false
+        };
+        
+        return handler.CreateToken(descriptor);
     }
 
     public async Task<bool> RegisterUser(RegisterUserDTO model)
