@@ -1,6 +1,5 @@
 ﻿using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Models;
-using FinanceManager.Data.Constants;
 using FinanceManager.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -10,17 +9,21 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using FinanceManager.Data;
+using FinanceManager.Data.Enums;
+using FinanceManager.Data.Extensions;
 using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace FinanceManager.Business.Services;
 
 public class AuthenticationService(
     IConfiguration configuration,
+    FinanceManagerDbContext context,
     UserManager<User> userManager,
     RoleManager<Role> roleManager)
     : IAuthenticationService
 {
-    public async Task<string> LoginUser(LoginUserDTO model)
+    public async Task<AuthorizationTokenDTO> LoginUser(LoginUserDTO model)
     {
         var user = await userManager.FindByEmailAsync(model.EmailAddress);
         if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
@@ -28,42 +31,28 @@ public class AuthenticationService(
             return null;
         }
 
-        var issuingOnAt = DateTimeOffset.UtcNow;
-        var expiringOnAt = issuingOnAt.AddHours(3);
+        var accessToken = await GenerateAccessToken(user);
+        var refreshToken = GenerateRefreshToken();
 
-        var authClaims = new Dictionary<string, object>
+        await context.UserTokens.AddAsync(new UserToken
         {
-            [JwtRegisteredClaimNames.Sub] = user.UserName ?? throw new InvalidOperationException("Username can't be empty"),
-            [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
-            [JwtRegisteredClaimNames.Iat] = issuingOnAt.ToUnixTimeSeconds().ToString(),
-            [JwtRegisteredClaimNames.Exp] = expiringOnAt.ToUnixTimeSeconds().ToString()
-        };
-
-        var userRoles = await userManager.GetRolesAsync(user);
-        foreach (var role in userRoles)
-        {
-            authClaims.Add(ClaimTypes.Role, role);   
-        }
-
-        var authSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(configuration["Authentication:Secret"] ??
-                                   throw new InvalidOperationException("Secret can't be empty")));
-
-        var descriptor = new SecurityTokenDescriptor
-        {
-            Issuer = configuration["Authentication:ValidIssuer"],
-            Audience = configuration["Authentication:ValidAudience"],
-            Expires = expiringOnAt.UtcDateTime,
-            Claims = authClaims,
-            SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-        };
-
-        var handler = new JsonWebTokenHandler
-        {
-            SetDefaultTimesOnTokenCreation = false
-        };
+            UserId = user.Id,
+            LoginProvider = "FinanceManager",
+            Name = user.NormalizedEmail!,
+            Value = accessToken,
+            RefreshToken = refreshToken,
+            RefreshTokenExpiresOnAt =
+                DateTime.UtcNow.AddMinutes(
+                    Convert.ToDouble(configuration["Authentication:RefreshTokenExpirationInMinutes"]))
+        });
         
-        return handler.CreateToken(descriptor);
+        await context.SaveChangesAsync();
+
+        return new AuthorizationTokenDTO
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
     }
 
     public async Task<bool> RegisterUser(RegisterUserDTO model)
@@ -89,17 +78,62 @@ public class AuthenticationService(
             return false;
         }
 
-        if (!await roleManager.RoleExistsAsync(RoleConstants.Admin))
-            await roleManager.CreateAsync(new Role(RoleConstants.Admin));
-        if (!await roleManager.RoleExistsAsync(RoleConstants.User))
-            await roleManager.CreateAsync(new Role(RoleConstants.User));
-
         // give all users the user role by default
-        if (await roleManager.RoleExistsAsync(RoleConstants.User))
+        if (await roleManager.RoleExistsAsync(Roles.User.StringValue()))
         {
-            await userManager.AddToRoleAsync(user, RoleConstants.User);
+            await userManager.AddToRoleAsync(user, Roles.User.StringValue());
         }
 
         return true;
+    }
+
+    private async Task<string> GenerateAccessToken(User user)
+    {
+        var issuingOnAt = DateTimeOffset.UtcNow;
+        var expiringOnAt =
+            issuingOnAt.AddMinutes(Convert.ToDouble(configuration["Authentication:AccessTokenExpirationInMinutes"]));
+
+        var authClaims = new Dictionary<string, object>
+        {
+            [JwtRegisteredClaimNames.Sub] =
+                user.UserName ?? throw new InvalidOperationException("Username can't be empty"),
+            [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
+            [JwtRegisteredClaimNames.Iat] = issuingOnAt.ToUnixTimeSeconds().ToString(),
+            [JwtRegisteredClaimNames.Exp] = expiringOnAt.ToUnixTimeSeconds().ToString()
+        };
+
+        var userRoles = await userManager.GetRolesAsync(user);
+        foreach (var role in userRoles)
+        {
+            authClaims.Add(ClaimTypes.Role, role);
+        }
+
+        var authSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(configuration["Authentication:Secret"] ??
+                                   throw new InvalidOperationException("Secret can't be empty")));
+
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = configuration["Authentication:ValidIssuer"],
+            Audience = configuration["Authentication:ValidAudience"],
+            Expires = expiringOnAt.UtcDateTime,
+            Claims = authClaims,
+            SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        };
+
+        var handler = new JsonWebTokenHandler
+        {
+            SetDefaultTimesOnTokenCreation = false
+        };
+
+        return handler.CreateToken(descriptor);
+    }
+
+    private static string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 }

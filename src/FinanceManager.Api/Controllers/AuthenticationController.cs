@@ -41,7 +41,7 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         {
             return Unauthorized();
         }
-        return Ok(new AuthorizationTokenViewModel(token));
+        return Ok(mapper.Map<AuthorizationTokenViewModel>(token));
     }
 
     /// <summary>

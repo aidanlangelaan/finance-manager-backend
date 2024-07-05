@@ -6,12 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FinanceManager.Data.Utils;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FinanceManager.Data;
 
 public class FinanceManagerDbContext(DbContextOptions<FinanceManagerDbContext> options)
-    : IdentityDbContext<User, Role, Guid>(options)
+    : IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>, IdentityUserLogin<Guid>,
+        IdentityRoleClaim<Guid>, UserToken>(options)
 {
     public DbSet<Account> Accounts { get; set; }
 
@@ -57,18 +59,27 @@ public class FinanceManagerDbContext(DbContextOptions<FinanceManagerDbContext> o
                     MySqlValueGenerationStrategy.ComputedColumn);
             }
         }
-        
+
         #endregion
 
         #region Authentication
 
-        builder.Entity<User>(b => { b.ToTable("Users"); });
+        builder.Entity<User>(b =>
+        {
+            b.ToTable("Users");
+            b.Property(u => u.LockoutEnd).HasColumnType("datetime");
+        });
 
         builder.Entity<IdentityUserClaim<Guid>>(b => { b.ToTable("UserClaims"); });
 
         builder.Entity<IdentityUserLogin<Guid>>(b => { b.ToTable("UserLogins"); });
 
-        builder.Entity<IdentityUserToken<Guid>>(b => { b.ToTable("UserTokens"); });
+        builder.Entity<UserToken>(b =>
+        {
+            b.ToTable("UserTokens");
+            b.Property(t => t.Value).IsRequired();
+            b.Property(t => t.Value).HasColumnName("AccessToken");
+        });
 
         builder.Entity<Role>(b => { b.ToTable("Roles"); });
 
@@ -89,6 +100,8 @@ public class FinanceManagerDbContext(DbContextOptions<FinanceManagerDbContext> o
             .WithMany(a => a.TransactionsFrom)
             .HasForeignKey(t => t.FromAccountId)
             .OnDelete(DeleteBehavior.NoAction);
+        
+        builder.Seed();
     }
 
     /// <summary>

@@ -13,8 +13,12 @@ public class AuthenticationViewModelMapperProfile : Profile
 
     private void CreateViewModelMapping()
     {
+        // ViewModel --> DTO 
         CreateMap<LoginUserViewModel, LoginUserDTO>();
 
         CreateMap<RegisterUserViewModel, RegisterUserDTO>();
+        
+        // DTO --> ViewModel
+        CreateMap<AuthorizationTokenDTO, AuthorizationTokenViewModel>();
     }
 }

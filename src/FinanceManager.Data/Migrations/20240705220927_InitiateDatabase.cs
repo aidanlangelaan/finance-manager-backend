@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace FinanceManager.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitiateDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -265,7 +267,10 @@ namespace FinanceManager.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Value = table.Column<string>(type: "longtext", nullable: true)
+                    RefreshToken = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RefreshTokenExpiresOnAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    AccessToken = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -279,6 +284,21 @@ namespace FinanceManager.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "Description" },
+                values: new object[] { 1, "Uncategorized" });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { new Guid("629ea9d6-eabd-41c1-88d9-184cdd74116e"), null, "SystemAdmin", "SYSTEMADMIN" },
+                    { new Guid("a5373b92-ae0c-4ad8-9b4b-e278a0e24f86"), null, "Admin", "ADMIN" },
+                    { new Guid("fd3b1720-0a61-408f-b208-0028af40f9e5"), null, "User", "USER" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",

@@ -1,6 +1,6 @@
-﻿namespace FinanceManager.Api.Models;
+﻿namespace FinanceManager.Business.Services.Models;
 
-public class AuthorizationTokenViewModel
+public class AuthorizationTokenDTO
 {
     public string AccessToken { get; init; }
     public string RefreshToken { get; init; }

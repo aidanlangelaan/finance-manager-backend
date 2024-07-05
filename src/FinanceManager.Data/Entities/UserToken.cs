@@ -8,14 +8,12 @@ namespace FinanceManager.Data.Entities;
 public class UserToken : IdentityUserToken<Guid>
 {
     [Required]
-    [Column(TypeName = "varchar(100)")]
-    public string AccessTokenExpiresOnAt { get; set; }
-
-    [Required]
-    [Column(TypeName = "varchar(100)")]
-    public string LastName { get; set; }
-
+    [Column(TypeName = "longtext")]
+    [ProtectedPersonalData]
+    // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
+    public string RefreshToken { get; set; }
+    
     [Required]
     [Column(TypeName = "datetime")]
-    public DateTime RegisteredOnAt { get; set; } = DateTime.UtcNow;
+    public DateTime RefreshTokenExpiresOnAt { get; set; }
 }
