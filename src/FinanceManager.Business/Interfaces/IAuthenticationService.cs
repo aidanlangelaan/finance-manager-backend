@@ -6,6 +6,7 @@ namespace FinanceManager.Business.Interfaces;
 
 public interface IAuthenticationService
 {
-    public Task<AuthorizationTokenDTO> LoginUser(LoginUserDTO model);
-    public Task<bool> RegisterUser(RegisterUserDTO model);
+    Task<bool> RegisterUser(RegisterUserDTO model);
+    Task<AuthorizationTokenDTO> LoginUser(LoginUserDTO model);
+    Task<AuthorizationTokenDTO> RefreshAccessToken(RefreshAccessTokenDTO model);
 }

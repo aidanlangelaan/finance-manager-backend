@@ -16,6 +16,33 @@ namespace FinanceManager.Api.Controllers;
 public class AuthenticationController(IAuthenticationService authenticationService, IMapper mapper)
     : ControllerBase
 {
+    
+
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /api/authentication/register
+    ///
+    /// </remarks>
+    /// <response code="200">User has been created</response>
+    /// <response code="400">Failed to process request or failed to register user</response>
+    [HttpPost]
+    [Route("register")]
+    [ProducesResponseType(typeof(AuthorizationTokenViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RegisterUser(RegisterUserViewModel model)
+    {
+        var result = await authenticationService.RegisterUser(mapper.Map<RegisterUserDTO>(model));
+        if (!result)
+        {
+            return BadRequest("User already exists or failed to register");
+        }
+        return Ok();
+    }
+    
     /// <summary>
     /// Login the user to retrieve their JWT token
     /// </summary>
@@ -43,29 +70,32 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         }
         return Ok(mapper.Map<AuthorizationTokenViewModel>(token));
     }
-
+    
     /// <summary>
-    /// Register a new user
+    /// Refresh the users access token using the provided refresh token
     /// </summary>
     /// <remarks>
     /// Sample request:
     ///
-    ///     POST /api/authentication/register
+    ///     POST /api/authentication/refresh
     ///
     /// </remarks>
-    /// <response code="200">User has been created</response>
-    /// <response code="400">Failed to process request or failed to register user</response>
+    /// <returns>An authentication token</returns>
+    /// <response code="200">User has been verified and an authorization token is returned</response>
+    /// <response code="401">User invalid, not found or existing refreshtoken has expired</response>
+    /// <response code="400">Failed to process request</response>
     [HttpPost]
-    [Route("register")]
+    [Route("refresh")]
     [ProducesResponseType(typeof(AuthorizationTokenViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> RegisterUser(RegisterUserViewModel model)
+    public async Task<IActionResult> RefreshAccessToken(AuthorizationTokenViewModel model)
     {
-        var result = await authenticationService.RegisterUser(mapper.Map<RegisterUserDTO>(model));
-        if (!result)
+        var token = await authenticationService.RefreshAccessToken(mapper.Map<RefreshAccessTokenDTO>(model));
+        if (token == null)
         {
-            return BadRequest("User already exists or failed to register");
+            return Unauthorized();
         }
-        return Ok();
+        return Ok(mapper.Map<AuthorizationTokenViewModel>(token));
     }
 }

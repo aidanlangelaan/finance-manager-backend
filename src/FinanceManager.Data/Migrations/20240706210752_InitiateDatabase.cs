@@ -295,9 +295,9 @@ namespace FinanceManager.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("629ea9d6-eabd-41c1-88d9-184cdd74116e"), null, "SystemAdmin", "SYSTEMADMIN" },
-                    { new Guid("a5373b92-ae0c-4ad8-9b4b-e278a0e24f86"), null, "Admin", "ADMIN" },
-                    { new Guid("fd3b1720-0a61-408f-b208-0028af40f9e5"), null, "User", "USER" }
+                    { new Guid("1b32bce9-dc26-406e-bdb0-a0b03281c296"), null, "Admin", "ADMIN" },
+                    { new Guid("9b2f4a06-98dd-49ec-8188-cf01f2c5ed95"), null, "SystemAdmin", "SYSTEMADMIN" },
+                    { new Guid("f2ae361a-cd28-4a5d-8686-9b024bcb66be"), null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(

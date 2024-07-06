@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinanceManager.Data.Migrations
 {
     [DbContext(typeof(FinanceManagerDbContext))]
-    [Migration("20240705220927_InitiateDatabase")]
+    [Migration("20240706210752_InitiateDatabase")]
     partial class InitiateDatabase
     {
         /// <inheritdoc />
@@ -148,19 +148,19 @@ namespace FinanceManager.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("629ea9d6-eabd-41c1-88d9-184cdd74116e"),
+                            Id = new Guid("9b2f4a06-98dd-49ec-8188-cf01f2c5ed95"),
                             Name = "SystemAdmin",
                             NormalizedName = "SYSTEMADMIN"
                         },
                         new
                         {
-                            Id = new Guid("a5373b92-ae0c-4ad8-9b4b-e278a0e24f86"),
+                            Id = new Guid("1b32bce9-dc26-406e-bdb0-a0b03281c296"),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = new Guid("fd3b1720-0a61-408f-b208-0028af40f9e5"),
+                            Id = new Guid("f2ae361a-cd28-4a5d-8686-9b024bcb66be"),
                             Name = "User",
                             NormalizedName = "USER"
                         });

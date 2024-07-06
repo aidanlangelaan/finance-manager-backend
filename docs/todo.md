@@ -5,8 +5,7 @@ These are things that still need doing or can be improved on.
 ## To do
 
 - Implement authentication and authorization
-  - Implement accesstoken refreshing
-  - Remove password from registration
+  - Remove password from registration and replace with email confirmation with temp password
   - Implement registration confirmation
 - Check if transaction and accounts are unique when importing records.
 - Create all basic CRUD service and controller calls for Account, Transaction and Categories.
