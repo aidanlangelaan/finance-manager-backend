@@ -1,6 +1,5 @@
 using FinanceManager.TransactionProcessor;
 using Serilog;
-using Serilog.Events;
 using Serilog.Templates;
 using Serilog.Templates.Themes;
 
@@ -17,16 +16,13 @@ try
                     "[{@t:HH:mm:ss} {@l:u3}{#if @tr is not null} ({substring(@tr,0,4)}:{substring(@sp,0,4)}){#end}] {@m}\n{@x}",
                     theme: TemplateTheme.Code));
         });
-    
+
     builder.ConfigureAppConfiguration((_, config) =>
-    {
-        config.AddJsonFile($"appsettings.local.json", optional: true);
-        config.AddEnvironmentVariables();
-    })
-    .ConfigureServices(services =>
-    {
-        services.AddHostedService<Worker>();
-    });
+        {
+            config.AddJsonFile($"appsettings.local.json", optional: true);
+            config.AddEnvironmentVariables();
+        })
+        .ConfigureServices(services => { services.AddHostedService<Worker>(); });
 
     await builder.Build().RunAsync();
 }
