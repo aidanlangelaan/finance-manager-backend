@@ -4,7 +4,6 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>dotnet-FinanceManager.TransactionProcessor-19FA51A9-9DF9-4BEF-A467-74C6C6B88DF2</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\FinanceManager.Api\FinanceManager.Api.csproj" />
       <ProjectReference Include="..\FinanceManager.Business\FinanceManager.Business.csproj" />
     </ItemGroup>
 </Project>

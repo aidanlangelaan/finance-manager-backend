@@ -1,3 +1,7 @@
+using FinanceManager.Api.Configurations;
+using FinanceManager.Business;
+using FinanceManager.Business.configurations;
+using FinanceManager.Data;
 using FinanceManager.TransactionProcessor;
 using Serilog;
 using Serilog.Templates;
@@ -5,6 +9,12 @@ using Serilog.Templates.Themes;
 
 try
 {
+    var configuration = new ConfigurationBuilder()
+        .AddEnvironmentVariables()
+        .AddCommandLine(args)
+        .AddJsonFile($"appsettings.local.json", optional: true)
+        .Build();
+
     var builder = Host
         .CreateDefaultBuilder(args)
         .UseSerilog((context, configuration) =>
@@ -19,10 +29,17 @@ try
 
     builder.ConfigureAppConfiguration((_, config) =>
         {
-            config.AddJsonFile($"appsettings.local.json", optional: true);
-            config.AddEnvironmentVariables();
+            config.Sources.Clear();
+            config.AddConfiguration(configuration);
         })
-        .ConfigureServices(services => { services.AddHostedService<Worker>(); });
+        .ConfigureServices(services =>
+        {
+            services.AddHostedService<Worker>();
+            services.ConfigureDataServices(configuration["ConnectionStrings:FinanceManagerContext"] ??
+                                           throw new InvalidOperationException("Connection string can't be empty"));
+            services.ConfigureApplicationServices();
+            services.AddAutoMapper(typeof(TransactionViewModelMapperProfile), typeof(TransactionMapperProfile));
+        });
 
     await builder.Build().RunAsync();
 }

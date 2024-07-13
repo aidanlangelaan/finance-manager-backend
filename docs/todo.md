@@ -4,6 +4,7 @@ These are things that still need doing or can be improved on.
 
 ## To do
 
+- Upgrade identity packages to use the latest .net 8 versions
 - Implement authentication and authorization
   - Remove password from registration and replace with email confirmation with temp password
   - Implement registration confirmation

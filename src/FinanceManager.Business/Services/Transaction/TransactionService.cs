@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Models;
 using FinanceManager.Data;

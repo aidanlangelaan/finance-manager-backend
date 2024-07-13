@@ -1,11 +1,10 @@
 ﻿using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Import;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using FinanceManager.Api.Models.Import;
+using FinanceManager.Data.Enums;
 
 namespace FinanceManager.Api.Controllers;
 
@@ -13,10 +12,10 @@ namespace FinanceManager.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ImportController(IImportService importService) : ControllerBase
+public class ImportController(IImportService importService, IMapper mapper) : ControllerBase
 {
     /// <summary>
-    /// Imports csv files containing transactions
+    /// Imports a single csv file containing transactions
     /// </summary>
     /// <remarks>
     /// Sample request:
@@ -24,23 +23,27 @@ public class ImportController(IImportService importService) : ControllerBase
     ///     POST /api/import/transactions
     ///
     /// </remarks>
-    /// <returns>Results for the imported transactions</returns>
-    /// <response code="200">File(s) have successfully been processed and imported</response>
-    /// <response code="400">Failed to process files and import records</response>          
+    /// <response code="200">File has been imported and is ready to be processed</response>
+    /// <response code="400">Failed to import file</response>          
     [HttpPost("transactions")]
     [ProducesResponseType(typeof(List<CsvImportResult>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(List<CsvImportResult>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ImportTransactions(ICollection<IFormFile> files)
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ImportTransactions(IFormFile file, BankType bankType)
     {
-        List<CsvImportResult> result = [];
-        if (files.Count <= 0) return BadRequest(result);
-
-        result = await importService.ProcessImport(files);
-        if (result.All(r => r.IsSuccess))
+        var viewModel = new ImportTransactionsViewModel
         {
-            return Ok(result);
+            File = file,
+            Bank = bankType
+        };
+        
+        var result = await importService.SaveTransactions(mapper.Map<ImportTransactionsDTO>(viewModel));
+        if (result)
+        {
+            return Ok();
         }
 
-        return BadRequest(result);
+        return BadRequest();
     }
+    
+    
 }

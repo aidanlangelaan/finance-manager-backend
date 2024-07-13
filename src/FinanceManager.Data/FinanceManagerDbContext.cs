@@ -3,10 +3,6 @@ using FinanceManager.Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using FinanceManager.Data.Utils;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FinanceManager.Data;
@@ -19,6 +15,8 @@ public class FinanceManagerDbContext(DbContextOptions<FinanceManagerDbContext> o
 
     public DbSet<Category> Categories { get; set; }
 
+    public DbSet<Import> Imports { get; set; }
+    
     public DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)

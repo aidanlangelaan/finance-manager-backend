@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using FinanceManager.Data.Constants;
 
@@ -24,17 +23,25 @@ public class Transaction : AuditableEntity
     public DateTime Date { get; set; }
 
     [Column(TypeName = "varchar(255)")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [Required]
     [Column(TypeName = "int")]
     public int CategoryId { get; set; } = CategoryConstants.UncategorizedId;
-
-
+    
+    [Column(TypeName = "int")]
+    public int? ImportId { get; set; }
+    
     // Foreign keys
+    [ForeignKey("FromAccountId")]
     public Account FromAccount { get; set; }
+    
+    [ForeignKey("ToAccountId")]
     public Account ToAccount { get; set; }
-
+    
     [ForeignKey("CategoryId")]
     public Category Category { get; set; }
+    
+    // Relations
+    public virtual Import? Import { get; set; }
 }

@@ -4,16 +4,8 @@ using FinanceManager.Business;
 using FinanceManager.Business.configurations;
 using FinanceManager.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -27,7 +19,8 @@ public class Startup(IConfiguration configuration)
     public void ConfigureServices(IServiceCollection services)
     {
         // Setup dependency injection
-        services.ConfigureDataServices(Configuration["ConnectionStrings:FinanceManagerContext"])
+        services.ConfigureDataServices(configuration["ConnectionStrings:FinanceManagerContext"] ??
+                                       throw new InvalidOperationException("Connection string can't be empty"))
             .ConfigureApplicationServices();
 
         // Adding Authentication  
@@ -40,6 +33,9 @@ public class Startup(IConfiguration configuration)
             // Adding Jwt Bearer  
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
+                var key = Configuration["Authentication:SecretKey"] ??
+                          throw new InvalidOperationException("Authentication secret key can't be empty");
+                
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters()
@@ -49,9 +45,7 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuer = true,
                     ValidIssuer = Configuration["Authentication:ValidIssuer"],
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                        Configuration["Authentication:Secret"] ??
-                        throw new InvalidOperationException("Secret can't be empty"))),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                     ValidateLifetime = true,
                     LifetimeValidator = TokenLifetimeValidator.Validate
                 };
@@ -97,7 +91,7 @@ public class Startup(IConfiguration configuration)
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
         app.UseSwagger();
-            
+
         app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Finance Manager - API"); });
     }
 
