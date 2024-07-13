@@ -3,7 +3,7 @@ using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FinanceManager.Business.Interfaces;
-using FinanceManager.Business.Services.Import;
+using FinanceManager.Business.Services.Models;
 using FinanceManager.Data;
 using FinanceManager.Data.Entities;
 using FinanceManager.Data.Enums;
@@ -18,6 +18,19 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
 {
     private static readonly char[] SeparatorChars = [';', '|', '\t', ','];
 
+    
+    public async Task<List<GetImportDTO>> GetAll()
+    {
+        var imports = await context.Imports.ToListAsync();
+        return mapper.Map<List<GetImportDTO>>(imports);
+    }
+
+    public async Task<GetImportDTO?> GetById(int id)
+    {
+        var imports = await context.Imports.FirstOrDefaultAsync(t => t.Id == id);
+        return mapper.Map<GetImportDTO>(imports);
+    }
+    
     public async Task<bool> SaveTransactions(ImportTransactionsDTO import)
     {
         // validate file
@@ -85,7 +98,7 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
         return result;
     }
 
-    private async Task<CsvImportResult> ProcessImport(Data.Entities.Import import)
+    private async Task<CsvImportResult> ProcessImport(Import import)
     {
         CsvImportResult result = new();
         try

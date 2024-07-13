@@ -1,7 +1,7 @@
 using FinanceManager.Data.Enums;
 using Microsoft.AspNetCore.Http;
 
-namespace FinanceManager.Business.Services.Import;
+namespace FinanceManager.Business.Services.Models;
 
 public class ImportTransactionsDTO
 {

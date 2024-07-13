@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using FinanceManager.Api.Models;
 using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Api.Controllers;
@@ -16,8 +14,6 @@ namespace FinanceManager.Api.Controllers;
 public class AuthenticationController(IAuthenticationService authenticationService, IMapper mapper)
     : ControllerBase
 {
-    
-
     /// <summary>
     /// Register a new user
     /// </summary>
@@ -82,7 +78,7 @@ public class AuthenticationController(IAuthenticationService authenticationServi
     /// </remarks>
     /// <returns>An authentication token</returns>
     /// <response code="200">User has been verified and an authorization token is returned</response>
-    /// <response code="401">User invalid, not found or existing refreshtoken has expired</response>
+    /// <response code="401">User invalid, not found or existing refresh token has expired</response>
     /// <response code="400">Failed to process request</response>
     [HttpPost]
     [Route("refresh")]

@@ -1,5 +1,4 @@
-﻿using System;
-using FinanceManager.Data.Constants;
+﻿using FinanceManager.Data.Constants;
 
 namespace FinanceManager.Business.Services.Models;
 

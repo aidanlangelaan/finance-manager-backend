@@ -3,10 +3,7 @@ using FinanceManager.Api.Models;
 using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace FinanceManager.Api.Controllers;
 
@@ -47,7 +44,7 @@ public class TransactionController(ITransactionService transactionService, IMapp
     ///
     /// </remarks>
     /// <returns>A single transaction</returns>
-    /// <response code="200">Transactions for given id has been retrieved</response>
+    /// <response code="200">Transaction for given id has been retrieved</response>
     /// <response code="404">Transaction not found for given id</response>
     /// <response code="400">Failed to process request</response>
     [HttpGet("{id:int}")]
@@ -83,7 +80,7 @@ public class TransactionController(ITransactionService transactionService, IMapp
     ///
     /// </remarks>
     /// <returns>A transaction</returns>
-    /// <response code="201">Transactions has been created</response>
+    /// <response code="201">Transaction has been created</response>
     /// <response code="400">Request is invalid</response>
     [HttpPost]
     [ProducesResponseType(typeof(GetTransactionViewModel), StatusCodes.Status201Created)]

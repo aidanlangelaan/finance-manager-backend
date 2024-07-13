@@ -15,7 +15,7 @@ public class TransactionService(FinanceManagerDbContext context, IMapper mapper)
         return mapper.Map<List<GetTransactionDTO>>(transactions);
     }
 
-    public async Task<GetTransactionDTO> GetById(int id)
+    public async Task<GetTransactionDTO?> GetById(int id)
     {
         var transaction = await context.Transactions.FirstOrDefaultAsync(t => t.Id == id);
         return mapper.Map<GetTransactionDTO>(transaction);

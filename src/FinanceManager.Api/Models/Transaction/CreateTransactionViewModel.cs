@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FinanceManager.Api.Models;
+﻿namespace FinanceManager.Api.Models;
 
 public class CreateTransactionViewModel
 {

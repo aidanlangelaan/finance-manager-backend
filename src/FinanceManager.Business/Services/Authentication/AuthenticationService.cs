@@ -4,12 +4,9 @@ using FinanceManager.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using FinanceManager.Business.Utils;
 using FinanceManager.Data;
 using FinanceManager.Data.Enums;
@@ -27,7 +24,7 @@ public class AuthenticationService(
     : IAuthenticationService
 {
     private const string SALT_SETTINGS_KEY = "Security:Salt";
-    
+
     public async Task<bool> RegisterUser(RegisterUserDTO model)
     {
         var existingUser = await userManager.FindByEmailAsync(model.EmailAddress);
@@ -60,7 +57,7 @@ public class AuthenticationService(
         return true;
     }
 
-    public async Task<AuthorizationTokenDTO> LoginUser(LoginUserDTO model)
+    public async Task<AuthorizationTokenDTO?> LoginUser(LoginUserDTO model)
     {
         var user = await userManager.FindByEmailAsync(model.EmailAddress);
         if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
@@ -72,7 +69,7 @@ public class AuthenticationService(
         var refreshToken = GenerateRefreshToken();
 
         var existingToken = await context.UserTokens
-            .FirstOrDefaultAsync(t => t.LoginProvider == configuration["Authentication:LoginProvider"] 
+            .FirstOrDefaultAsync(t => t.LoginProvider == configuration["Authentication:LoginProvider"]
                                       && t.UserId == user.Id
                                       && t.Name == user.NormalizedUserName);
         if (existingToken != null)
@@ -101,24 +98,25 @@ public class AuthenticationService(
         };
     }
 
-    public async Task<AuthorizationTokenDTO> RefreshAccessToken(RefreshAccessTokenDTO model)
+    public async Task<AuthorizationTokenDTO?> RefreshAccessToken(RefreshAccessTokenDTO model)
     {
         string identity;
-        
+
         try
         {
-            identity = await GetIdentityFromExpiredAccessToken(model.AccessToken);   
+            identity = await GetIdentityFromExpiredAccessToken(model.AccessToken);
         }
         catch (SecurityTokenException)
         {
             return null;
         }
-        
+
         var userToken = await context.UserTokens
-            .FirstOrDefaultAsync(t => t.Value == SecurityUtils.HashValue(model.AccessToken, configuration[SALT_SETTINGS_KEY])
-                                      && t.RefreshToken == SecurityUtils.HashValue(model.RefreshToken, configuration[SALT_SETTINGS_KEY])
-                                      && t.LoginProvider == configuration["Authentication:LoginProvider"] 
-                                      && t.Name == identity);
+            .FirstOrDefaultAsync(t =>
+                t.Value == SecurityUtils.HashValue(model.AccessToken, configuration[SALT_SETTINGS_KEY])
+                && t.RefreshToken == SecurityUtils.HashValue(model.RefreshToken, configuration[SALT_SETTINGS_KEY])
+                && t.LoginProvider == configuration["Authentication:LoginProvider"]
+                && t.Name == identity);
         if (userToken == null)
         {
             return null;
@@ -128,9 +126,9 @@ public class AuthenticationService(
         {
             return null;
         }
-        
+
         var user = await context.Users.FindAsync(userToken.UserId);
-        var accessToken = await GenerateAccessToken(user);
+        var accessToken = await GenerateAccessToken(user!);
         var refreshToken = GenerateRefreshToken();
 
         // hash the tokens
@@ -220,6 +218,6 @@ public class AuthenticationService(
             throw new SecurityTokenException("Invalid token");
         }
 
-        return result.Claims[JwtRegisteredClaimNames.Sub].ToString();
+        return result.Claims[JwtRegisteredClaimNames.Sub].ToString()!;
     }
 }

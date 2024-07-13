@@ -1,6 +1,6 @@
 using FinanceManager.Data.Enums;
 
-namespace FinanceManager.Api.Models.Import;
+namespace FinanceManager.Api.Models;
 
 public class ImportTransactionsViewModel
 {

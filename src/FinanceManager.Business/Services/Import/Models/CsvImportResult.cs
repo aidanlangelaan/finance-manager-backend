@@ -1,4 +1,4 @@
-﻿namespace FinanceManager.Business.Services.Import;
+﻿namespace FinanceManager.Business.Services.Models;
 
 public class CsvImportResult
 {

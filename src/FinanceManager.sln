@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManager.Data", "Fina
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManager.Business", "FinanceManager.Business\FinanceManager.Business.csproj", "{89DD7415-429B-432F-A3B8-520610F2F64B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4A897D8-1F1A-47E3-9D25-22A2DFB31E55}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Solution Items", "0. Solution Items", "{F4A897D8-1F1A-47E3-9D25-22A2DFB31E55}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\design.md = ..\docs\design.md
 		..\docs\todo.md = ..\docs\todo.md
@@ -18,6 +18,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.TransactionProcessor", "FinanceManager.TransactionProcessor\FinanceManager.TransactionProcessor.csproj", "{2B0FBF58-6E76-478A-B880-393CF8ABDD9C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Applications", "1. Applications", "{9B7AC969-DBD8-4F61-ADFD-BABF8243A1B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Shared", "2. Shared", "{08E92A2C-B9EE-448E-B61D-22D719D60338}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,5 +51,11 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {218ABC9B-75C5-4964-A023-372FD3A89549}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{56B990BA-E935-4BE5-BAF4-1EDE99327667} = {9B7AC969-DBD8-4F61-ADFD-BABF8243A1B9}
+		{2B0FBF58-6E76-478A-B880-393CF8ABDD9C} = {9B7AC969-DBD8-4F61-ADFD-BABF8243A1B9}
+		{89DD7415-429B-432F-A3B8-520610F2F64B} = {08E92A2C-B9EE-448E-B61D-22D719D60338}
+		{C7EF7481-EA72-496F-9053-F0A6474EB22C} = {08E92A2C-B9EE-448E-B61D-22D719D60338}
 	EndGlobalSection
 EndGlobal

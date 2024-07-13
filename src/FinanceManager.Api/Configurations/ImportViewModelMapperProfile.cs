@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using FinanceManager.Api.Models.Import;
-using FinanceManager.Business.Services.Import;
+using FinanceManager.Api.Models;
+using FinanceManager.Business.Services.Models;
 
 namespace FinanceManager.Api.Configurations;
 
@@ -17,6 +17,6 @@ public class ImportViewModelMapperProfile : Profile
         CreateMap<ImportTransactionsViewModel, ImportTransactionsDTO>();
         
         // DTO --> ViewModel
-        
+        CreateMap<GetImportDTO, GetImportViewModel>();
     }
 }

@@ -33,9 +33,6 @@ public class Startup(IConfiguration configuration)
             // Adding Jwt Bearer  
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                var key = Configuration["Authentication:SecretKey"] ??
-                          throw new InvalidOperationException("Authentication secret key can't be empty");
-                
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters()
@@ -45,7 +42,9 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuer = true,
                     ValidIssuer = Configuration["Authentication:ValidIssuer"],
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                        Configuration["Authentication:Secret"] ??
+                        throw new InvalidOperationException("Secret can't be empty"))),
                     ValidateLifetime = true,
                     LifetimeValidator = TokenLifetimeValidator.Validate
                 };
