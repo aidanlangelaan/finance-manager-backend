@@ -83,6 +83,9 @@ namespace FinanceManager.Data.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTime>("CreatedOnAt"));
 
                     b.Property<string>("Description")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
@@ -110,7 +113,8 @@ namespace FinanceManager.Data.Migrations
                         {
                             Id = 1,
                             CreatedOnAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Uncategorized",
+                            Description = "",
+                            Name = "Uncategorized",
                             RowVersion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UpdatedOnAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -194,19 +198,19 @@ namespace FinanceManager.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1896c355-6550-4f28-ae63-176073b9454d"),
+                            Id = new Guid("4ba94ced-1d0d-49cd-8534-604b3373465f"),
                             Name = "SystemAdmin",
                             NormalizedName = "SYSTEMADMIN"
                         },
                         new
                         {
-                            Id = new Guid("c4007b7e-a94e-44b5-b1ef-c05f39030899"),
+                            Id = new Guid("35541920-f7e1-448d-9e08-4220c03eaebf"),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = new Guid("f0110143-a9d8-4602-83ac-ffe54fa32188"),
+                            Id = new Guid("f76f491d-b6b5-42df-81ed-2f3712bdafac"),
                             Name = "User",
                             NormalizedName = "USER"
                         });

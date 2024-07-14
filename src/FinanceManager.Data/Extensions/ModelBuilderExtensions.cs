@@ -23,7 +23,8 @@ public static class ModelBuilderExtensions
             categories.Add(new Category
             {
                 Id = (int) category,
-                Description = category.StringValue()
+                Name = category.StringValue(),
+                Description = string.Empty
             });
         }
 
