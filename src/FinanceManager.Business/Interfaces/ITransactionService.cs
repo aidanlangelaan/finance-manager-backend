@@ -15,4 +15,6 @@ public interface ITransactionService
     public Task Update(UpdateTransactionDTO model);
 
     public Task Delete(int id);
+    
+    public Task<List<GetTransactionDTO>> AssignCategoryToTransaction(AssignCategoryToTransactionDTO model);
 }

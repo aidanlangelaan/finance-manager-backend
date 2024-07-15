@@ -4,7 +4,7 @@ These are things that still need doing or can be improved on.
 
 ## To do
 
-- Create all basic CRUD service and controller calls for Account and Categories
+- Create all basic CRUD service and controller calls for Account
 - Generic error handling to prevent uncaught 500 errors being returned
 
 ## To improve
@@ -15,3 +15,5 @@ These are things that still need doing or can be improved on.
   - Remove password from registration and replace with email confirmation with temp password
   - Implement registration confirmation
   - Implement logout
+- Category matching
+  - Figure out a more accurate way to identify similar transactions with fuzzy matching of description
