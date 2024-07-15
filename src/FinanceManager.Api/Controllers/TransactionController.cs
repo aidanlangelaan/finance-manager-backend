@@ -31,7 +31,7 @@ public class TransactionController(ITransactionService transactionService, IMapp
     public async Task<IActionResult> Get()
     {
         var transactions = await transactionService.GetAll();
-        return Ok(transactions);
+        return Ok(mapper.Map<List<GetTransactionViewModel>>(transactions));
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public class TransactionController(ITransactionService transactionService, IMapp
         var transaction = await transactionService.GetById(id);
         if (transaction != null)
         {
-            return Ok(transaction);
+            return Ok(mapper.Map<GetTransactionViewModel>(transaction));
         }
 
         return NotFound();
@@ -88,7 +88,7 @@ public class TransactionController(ITransactionService transactionService, IMapp
     public async Task<IActionResult> Create(CreateTransactionViewModel model)
     {
         var transaction = await transactionService.Create(mapper.Map<CreateTransactionDTO>(model));
-        return Created($"api/transaction/{transaction.Id}", transaction);
+        return Created($"api/transaction/{transaction.Id}", mapper.Map<GetTransactionViewModel>(transaction));
     }
 
     /// <summary>

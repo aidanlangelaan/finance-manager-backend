@@ -1,6 +1,4 @@
-﻿using FinanceManager.Data.Constants;
-
-namespace FinanceManager.Business.Services.Models;
+﻿namespace FinanceManager.Business.Services.Models;
 
 public class UpdateTransactionDTO
 {
@@ -14,7 +12,5 @@ public class UpdateTransactionDTO
 
     public DateTime Date { get; set; }
 
-    public string Description { get; set; }
-
-    public int CategoryId { get; set; } = CategoryConstants.UncategorizedId;
+    public string? Description { get; set; }
 }

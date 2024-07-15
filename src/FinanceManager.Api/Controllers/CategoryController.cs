@@ -31,7 +31,7 @@ public class CategoryController(ICategoryService categoryService, IMapper mapper
     public async Task<IActionResult> Get()
     {
         var categories = await categoryService.GetAll();
-        return Ok(categories);
+        return Ok(mapper.Map<List<GetCategoryViewModel>>(categories));
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public class CategoryController(ICategoryService categoryService, IMapper mapper
         var category = await categoryService.GetById(id);
         if (category != null)
         {
-            return Ok(category);
+            return Ok(mapper.Map<GetCategoryViewModel>(category));
         }
 
         return NotFound();
@@ -70,12 +70,8 @@ public class CategoryController(ICategoryService categoryService, IMapper mapper
     ///
     ///     POST /api/category/1
     ///     {
-    ///         "amount": 0,
-    ///         "fromAccountId": 0,
-    ///         "toAccountId": 0,
-    ///         "date": "2021-10-15T22:32:25.405Z",
-    ///         "description": "string",
-    ///         "categoryId": 0
+    ///         "name": "string",
+    ///         "description": "string"
     ///     }
     ///
     /// </remarks>
@@ -88,7 +84,7 @@ public class CategoryController(ICategoryService categoryService, IMapper mapper
     public async Task<IActionResult> Create(CreateCategoryViewModel model)
     {
         var category = await categoryService.Create(mapper.Map<CreateCategoryDTO>(model));
-        return Created($"api/category/{category.Id}", category);
+        return Created($"api/category/{category.Id}", mapper.Map<GetCategoryViewModel>(category));
     }
 
     /// <summary>
@@ -100,12 +96,8 @@ public class CategoryController(ICategoryService categoryService, IMapper mapper
     ///     PUT /api/category
     ///     {
     ///         "id": 0
-    ///         "amount": 0,
-    ///         "fromAccountId": 0,
-    ///         "toAccountId": 0,
-    ///         "date": "2021-10-15T22:32:25.405Z",
-    ///         "description": "string",
-    ///         "categoryId": 0
+    ///         "name": "string",
+    ///         "description": "string"
     ///     }
     ///
     /// </remarks>
