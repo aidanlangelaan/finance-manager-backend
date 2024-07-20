@@ -4,7 +4,9 @@ namespace FinanceManager.Api.Models;
 
 public class ImportTransactionsViewModel
 {
-    public IFormFile File { get; set; }
+    public IFormFile File { get; init; }
     
-    public BankType Bank { get; set; }
+    public BankType Bank { get; init; }
+    
+    public bool AssignCategories { get; init; }
 }

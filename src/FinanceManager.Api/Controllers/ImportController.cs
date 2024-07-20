@@ -77,15 +77,16 @@ public class ImportController(IImportService importService, IMapper mapper) : Co
     [HttpPost]
     [ProducesResponseType(typeof(List<CsvImportResult>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ImportTransactions(IFormFile file, BankType bankType)
+    public async Task<IActionResult> ImportTransactions(IFormFile file, BankType bankType, bool assignCategories = false)
     {
         var viewModel = new ImportTransactionsViewModel
         {
             File = file,
-            Bank = bankType
+            Bank = bankType,
+            AssignCategories = assignCategories
         };
         
-        var result = await importService.SaveTransactions(mapper.Map<ImportTransactionsDTO>(viewModel));
+        var result = await importService.SaveImportFile(mapper.Map<ImportTransactionsDTO>(viewModel));
         if (result)
         {
             return Ok();
@@ -93,6 +94,4 @@ public class ImportController(IImportService importService, IMapper mapper) : Co
 
         return BadRequest();
     }
-    
-    
 }

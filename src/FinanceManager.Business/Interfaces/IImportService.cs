@@ -8,7 +8,7 @@ public interface IImportService
 
     public Task<GetImportDTO?> GetById(int id);
     
-    public Task<bool> SaveTransactions(ImportTransactionsDTO import);
+    public Task<bool> SaveImportFile(ImportTransactionsDTO import);
 
     public Task<CsvImportResult?> HandleImports();
 }

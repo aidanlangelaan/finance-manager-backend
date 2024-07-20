@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using FinanceManager.Business.Services.Models;
+using FinanceManager.Data.Entities;
 
 namespace FinanceManager.Business.Interfaces;
 
@@ -17,4 +17,6 @@ public interface ITransactionService
     public Task Delete(int id);
     
     public Task<List<GetTransactionDTO>> AssignCategoryToTransaction(AssignCategoryToTransactionDTO model);
+
+    public Expression<Func<Transaction, bool>> FuzzyTransactionLookupClause(Transaction transaction);
 }

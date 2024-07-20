@@ -8,4 +8,6 @@ public class ImportTransactionsDTO
     public IFormFile File { get; init; }
     
     public BankType Bank { get; init; }
+    
+    public bool AssignCategories { get; init; }
 }

@@ -19,6 +19,10 @@ public class Import : AuditableEntity
     public BankType BankType { get; set; }
     
     [Required]
+    [Column(TypeName = "bit")]
+    public bool AssignCategories { get; set; }
+    
+    [Required]
     [Column(TypeName = "tinyint")]
     public ImportStatus Status { get; set; }
 

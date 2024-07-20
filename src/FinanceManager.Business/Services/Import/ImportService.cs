@@ -1,10 +1,12 @@
 ﻿using System.Globalization;
+using System.Linq.Expressions;
 using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Models;
 using FinanceManager.Data;
+using FinanceManager.Data.Constants;
 using FinanceManager.Data.Entities;
 using FinanceManager.Data.Enums;
 using Microsoft.AspNetCore.StaticFiles;
@@ -13,12 +15,16 @@ using Microsoft.Extensions.Logging;
 
 namespace FinanceManager.Business.Services;
 
-public class ImportService(FinanceManagerDbContext context, ILogger<ImportService> logger, IMapper mapper)
+public class ImportService(
+    FinanceManagerDbContext context,
+    ILogger<ImportService> logger,
+    IMapper mapper,
+    ITransactionService transactionService)
     : IImportService
 {
     private static readonly char[] SeparatorChars = [';', '|', '\t', ','];
 
-    
+
     public async Task<List<GetImportDTO>> GetAll()
     {
         var imports = await context.Imports.ToListAsync();
@@ -30,8 +36,8 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
         var imports = await context.Imports.FirstOrDefaultAsync(t => t.Id == id);
         return mapper.Map<GetImportDTO>(imports);
     }
-    
-    public async Task<bool> SaveTransactions(ImportTransactionsDTO import)
+
+    public async Task<bool> SaveImportFile(ImportTransactionsDTO import)
     {
         // validate file
         var fileProvider = new FileExtensionContentTypeProvider();
@@ -56,6 +62,7 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
                 OriginalFileName = import.File.FileName,
                 TemporaryFileName = temporaryFileName,
                 BankType = import.Bank,
+                AssignCategories = import.AssignCategories,
                 Status = ImportStatus.Uploaded
             });
 
@@ -92,7 +99,7 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
         // update status depending on the result
         import.Status = !result.IsSuccess ? ImportStatus.Failed : ImportStatus.Processed;
         await context.SaveChangesAsync();
-        
+
         result.FileName = import.OriginalFileName;
 
         return result;
@@ -121,7 +128,14 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
             var records = csv.GetRecords<CsvImportRabo>().ToList();
             if (records.Count > 0)
             {
-                result = await ProcessRecords(records, import.Id);
+                result = await ProcessRecords(records, import);
+
+                if (result.IsSuccess && import.AssignCategories)
+                {
+                    logger.LogInformation("Assigning categories to imported transactions for import with ID {ImportId}",
+                        import.Id);
+                    await AssignCategoriesToImportedTransactions(import.Id);
+                }
             }
         }
         catch (BadDataException exception)
@@ -132,7 +146,7 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
         return result;
     }
 
-    private async Task<CsvImportResult> ProcessRecords(List<CsvImportRabo> records, int? importId)
+    private async Task<CsvImportResult> ProcessRecords(List<CsvImportRabo> records, Import import)
     {
         CsvImportResult result = new();
         foreach (var record in records)
@@ -140,8 +154,8 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
             try
             {
                 var transaction = mapper.Map<Transaction>(record);
-                transaction.ImportId = importId;
-                
+                transaction.ImportId = import.Id;
+
                 var account = await GetFromAccount(record);
                 var counterpartyAccount = await GetCounterPartyAccount(record);
                 if (transaction.Amount < 0)
@@ -216,9 +230,44 @@ public class ImportService(FinanceManagerDbContext context, ILogger<ImportServic
             Iban = record.Iban,
             Name = string.Empty
         };
-        
+
         await context.Accounts.AddAsync(account);
 
         return account;
+    }
+
+    private async Task AssignCategoriesToImportedTransactions(int importId)
+    {
+        var import = await context.Imports
+            .Include(import => import.Transactions)
+            .FirstOrDefaultAsync(i => i.Id == importId);
+
+        if (import == null)
+        {
+            return;
+        }
+
+        Expression<Func<Transaction, bool>> notUncategorizedPredicate =
+            t => t.CategoryId != CategoryConstants.UncategorizedId;
+        foreach (var transaction in import.Transactions)
+        {
+            // build fuzzy predicate
+            var fuzzyTransactionLookupClause = transactionService.FuzzyTransactionLookupClause(transaction);
+            var fullExpression = Expression.Lambda<Func<Transaction, bool>>(
+                Expression.AndAlso(fuzzyTransactionLookupClause, notUncategorizedPredicate),
+                fuzzyTransactionLookupClause.Parameters);
+
+            // find matching transactions based on iban and name
+            var matchingTransaction = await context.Transactions
+                .Where(fullExpression).SingleOrDefaultAsync();
+
+            if (matchingTransaction == null)
+            {
+                continue;
+            }
+
+            await transactionService.AssignCategoryToTransaction(new AssignCategoryToTransactionDTO
+                { TransactionId = transaction.Id, CategoryId = transaction.CategoryId, ApplyToSimilarTransactions = true });
+        }
     }
 }
