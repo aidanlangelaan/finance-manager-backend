@@ -7,6 +7,7 @@ These are things that still need doing or can be improved on.
 - Create all basic CRUD service and controller calls for Account
 - Generic error handling to prevent uncaught 500 errors being returned
 - Cleanup previous imported files after x amount of time
+- Implement seq for serilog (https://codewithmukesh.com/blog/structured-logging-with-serilog-in-aspnet-core/)
 
 ## To improve
 

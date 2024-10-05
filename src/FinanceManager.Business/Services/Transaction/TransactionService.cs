@@ -51,8 +51,6 @@ public class TransactionService(FinanceManagerDbContext context, IMapper mapper)
         }
     }
 
-    private const int FUZZY_LEVEL = 3;
-
     public async Task<List<GetTransactionDTO>> AssignCategoryToTransaction(
         AssignCategoryToTransactionDTO model)
     {
@@ -82,14 +80,7 @@ public class TransactionService(FinanceManagerDbContext context, IMapper mapper)
                 .Include(x => x.ToAccount)
                 .Where(FuzzyTransactionLookupClause(transaction))
                 .ToListAsync();
-
-            // TODO: Fuzzy compare using Levenshtein distance, needs improvement before I can use it
-            // var similarTransactions = transactions
-            //     .Where(t => t.Description != null
-            //                 && (t.Description.Normalize().Equals(transaction.Description?.NormalizeValue())
-            //                     || t.Description.LevenshteinDistance(transaction.Description?.NormalizeValue()) < FUZZY_LEVEL)
-            //     ).ToList();
-
+            
             if (transactions.Count > 0)
             {
                 transactions.ForEach(x => { x.CategoryId = category.Id; });
@@ -104,18 +95,16 @@ public class TransactionService(FinanceManagerDbContext context, IMapper mapper)
         return result;
     }
 
-    public Expression<Func<Transaction, bool>> FuzzyTransactionLookupClause(Transaction transaction)
-    {
-        return t => t.Id != transaction.Id &&
-                    // from iban not empty and both from-iban and from-name match
-                    (t.FromAccount.Iban != null && t.FromAccount.Iban.Equals(transaction.FromAccount.Iban) &&
-                     t.FromAccount.Name.Equals(transaction.FromAccount.Name)
-                     // to iban not empty and both to-iban and to-name match
-                     && t.ToAccount.Iban != null && t.ToAccount.Iban.Equals(transaction.ToAccount.Iban) &&
-                     t.ToAccount.Name.Equals(transaction.ToAccount.Name)
-                     // from iban empty but both from-iban and from-name match
-                     || (t.FromAccount.Iban == null && t.FromAccount.Name.Equals(transaction.FromAccount.Name))
-                     // to iban empty but both to-iban and to-name match
-                     || t.ToAccount.Iban == null && t.ToAccount.Name.Equals(transaction.ToAccount.Name));
-    }
+    public Expression<Func<Transaction, bool>> FuzzyTransactionLookupClause(Transaction transaction) =>
+        t => t.Id != transaction.Id &&
+             // from iban not empty and both from-iban and from-name match
+             (t.FromAccount.Iban != null && t.FromAccount.Iban.Equals(transaction.FromAccount.Iban) &&
+              t.FromAccount.Name.Equals(transaction.FromAccount.Name)
+              // to iban not empty and both to-iban and to-name match
+              && t.ToAccount.Iban != null && t.ToAccount.Iban.Equals(transaction.ToAccount.Iban) &&
+              t.ToAccount.Name.Equals(transaction.ToAccount.Name)
+              // from iban empty but both from-iban and from-name match
+              || (t.FromAccount.Iban == null && t.FromAccount.Name.Equals(transaction.FromAccount.Name))
+              // to iban empty but both to-iban and to-name match
+              || t.ToAccount.Iban == null && t.ToAccount.Name.Equals(transaction.ToAccount.Name));
 }

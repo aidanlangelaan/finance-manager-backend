@@ -31,6 +31,8 @@ public class Transaction : AuditableEntity
     
     [Column(TypeName = "int")]
     public int? ImportId { get; set; }
+
+    private object[] HashProperties => [Amount, FromAccountId, ToAccountId, Date, Description ?? string.Empty, CategoryId];
     
     // Foreign keys
     [ForeignKey("FromAccountId")]

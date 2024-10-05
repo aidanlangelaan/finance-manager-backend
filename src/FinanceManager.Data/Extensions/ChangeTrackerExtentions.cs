@@ -1,5 +1,6 @@
 ﻿using System;
 using FinanceManager.Data.Entities;
+using FinanceManager.Data.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -31,6 +32,17 @@ public static class ChangeTrackerExtensions
 				default:
 					// do nothing
 				break;
+			}
+
+			// update the hash
+			if (auditableEntity.HasProperty("HashProperties"))
+			{
+				var hashProperties = auditableEntity.GetPropertyValue<object[]>("HashProperties");
+				auditableEntity.Hash = HashUtils.GetHash(hashProperties!);
+			}
+			else
+			{
+				auditableEntity.Hash = HashUtils.GetHash(auditableEntity);
 			}
 		}
 	}
