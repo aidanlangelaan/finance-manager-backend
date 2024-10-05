@@ -16,6 +16,6 @@ Use the following commands:
 
   `dotnet ef --startup-project ./FinanceManager.Api --project ./FinanceManager.Data database update`
 
-- Partual database update or rollback to target migration
+- Partial database update or rollback to target migration
 
   `dotnet ef --startup-project ./FinanceManager.Api --project ./FinanceManager.Data database update {TARGET MIGRATION}`
