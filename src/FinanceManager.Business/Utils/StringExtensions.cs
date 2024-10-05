@@ -4,9 +4,9 @@ public static class StringExtensions
 {
     public static int LevenshteinDistance(this string source, string? target)
     {
-        if (string.IsNullOrEmpty(source) && string.IsNullOrEmpty(target)) return 0;
-        if (string.IsNullOrEmpty(source)) return target.Length;
-        if (string.IsNullOrEmpty(target)) return source.Length;
+        if (string.IsNullOrEmpty(source) && !string.IsNullOrEmpty(target)) return target.Length;
+        if (string.IsNullOrEmpty(target) && !string.IsNullOrEmpty(source)) return source.Length;
+        if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(target)) return 0;
 
         var sourceLength = source.Length;
         var targetLength = target.Length;

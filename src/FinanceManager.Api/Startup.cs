@@ -5,9 +5,8 @@ using FinanceManager.Business.configurations;
 using FinanceManager.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
 using System.Text;
+using NSwag;
 
 namespace FinanceManager.Api;
 
@@ -19,7 +18,7 @@ public class Startup(IConfiguration configuration)
     public void ConfigureServices(IServiceCollection services)
     {
         // Setup dependency injection
-        services.ConfigureDataServices(configuration["ConnectionStrings:FinanceManagerContext"] ??
+        services.ConfigureDataServices(Configuration["ConnectionStrings:FinanceManagerContext"] ??
                                        throw new InvalidOperationException("Connection string can't be empty"))
             .ConfigureApplicationServices();
 
@@ -89,56 +88,46 @@ public class Startup(IConfiguration configuration)
 
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
-        app.UseSwagger();
-
-        app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Finance Manager - API"); });
+        // Add OpenAPI 3.0 document serving middleware
+        // Available at: http://localhost:<port>/swagger/v1/swagger.json
+        app.UseOpenApi();
+        
+        // Add web UIs to interact with the document
+        // Available at: http://localhost:<port>/swagger
+        app.UseSwaggerUi();
     }
 
     private static void AddSwagger(IServiceCollection services)
     {
-        services.AddSwaggerGen(options =>
+        services.AddOpenApiDocument(config =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo
+            config.PostProcess = document =>
             {
-                Version = "v1",
-                Title = "Finance Manager - API",
-                Description = "Web API for registering and displaying financial data.",
-                Contact = new OpenApiContact
+                document.Info.Version = "v1";
+                document.Info.Title = "Finance Manager - API";
+                document.Info.Description = "Web API for registering and displaying financial data.";
+                document.Info.Contact = new OpenApiContact
                 {
                     Name = "Aidan Langelaan",
                     Email = "aidan@langelaan.pro",
-                    Url = new Uri("https://twitter.com/aidanlangelaan")
-                },
-            });
+                    Url = "https://twitter.com/aidanlangelaan"
+                };
+            };
 
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Description = "JWT Authorization header using the Bearer scheme.",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "Bearer",
-                BearerFormat = "JWT"
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
+            config.AddSecurity("Bearer", Enumerable.Empty<string>(),
+                new OpenApiSecurityScheme()
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Id = "Bearer",
-                            Type = ReferenceType.SecurityScheme
-                        }
-                    },
-                    new List<string>()
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    Description = "Type into the textbox: 'Bearer {your JWT token}'.",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT"
                 }
-            });
+            );
 
-            // Set the comments path for the Swagger JSON and UI.
-            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            config.OperationProcessors.Add(
+                new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("Bearer"));
         });
     }
 }

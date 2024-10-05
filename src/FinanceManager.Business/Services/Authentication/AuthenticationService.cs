@@ -82,8 +82,8 @@ public class AuthenticationService(
             UserId = user.Id,
             LoginProvider = configuration["Authentication:LoginProvider"] ?? string.Empty,
             Name = user.NormalizedEmail!,
-            Value = SecurityUtils.HashValue(accessToken, configuration[SALT_SETTINGS_KEY]),
-            RefreshToken = SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY]),
+            Value = SecurityUtils.HashValue(accessToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty),
+            RefreshToken = SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty),
             RefreshTokenExpiresOnAt =
                 DateTime.UtcNow.AddMinutes(
                     Convert.ToDouble(configuration["Authentication:RefreshTokenExpirationInMinutes"]))
@@ -113,8 +113,8 @@ public class AuthenticationService(
 
         var userToken = await context.UserTokens
             .FirstOrDefaultAsync(t =>
-                t.Value == SecurityUtils.HashValue(model.AccessToken, configuration[SALT_SETTINGS_KEY])
-                && t.RefreshToken == SecurityUtils.HashValue(model.RefreshToken, configuration[SALT_SETTINGS_KEY])
+                t.Value == SecurityUtils.HashValue(model.AccessToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty)
+                && t.RefreshToken == SecurityUtils.HashValue(model.RefreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty)
                 && t.LoginProvider == configuration["Authentication:LoginProvider"]
                 && t.Name == identity);
         if (userToken == null)
@@ -132,8 +132,8 @@ public class AuthenticationService(
         var refreshToken = GenerateRefreshToken();
 
         // hash the tokens
-        userToken.Value = SecurityUtils.HashValue(accessToken, configuration[SALT_SETTINGS_KEY]);
-        userToken.RefreshToken = SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY]);
+        userToken.Value = SecurityUtils.HashValue(accessToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty);
+        userToken.RefreshToken = SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty);
         userToken.RefreshTokenExpiresOnAt =
             DateTime.UtcNow.AddMinutes(
                 Convert.ToDouble(configuration["Authentication:RefreshTokenExpirationInMinutes"]));
