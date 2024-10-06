@@ -6,7 +6,7 @@ public class GetImportViewModel
 {
     public int Id { get; set; }
 
-    public string OriginalFileName { get; set; }
+    public string? OriginalFileName { get; set; }
 
     public BankType BankType { get; set; }
     
