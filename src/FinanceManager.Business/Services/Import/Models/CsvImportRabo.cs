@@ -1,15 +1,14 @@
-﻿using System;
-using CsvHelper.Configuration.Attributes;
+﻿using CsvHelper.Configuration.Attributes;
 
 namespace FinanceManager.Business.Services.Models;
 
 public class CsvImportRabo
 {
     [Name("IBAN/BBAN")]
-    public string Iban { get; set; }
+    public string? Iban { get; set; }
 
     [Name("Munt")]
-    public string Currency { get; set; }
+    public string? Currency { get; set; }
 
     [Name("Volgnr")]
     public long TransactionCount { get; set; }
@@ -21,17 +20,17 @@ public class CsvImportRabo
     public decimal Amount { get; set; }
 
     [Name("Tegenrekening IBAN/BBAN")]
-    public string CounterpartyIban { get; set; }
+    public string? CounterpartyIban { get; set; }
 
     [Name("Naam tegenpartij")]
-    public string CounterpartyName { get; set; }
+    public string? CounterpartyName { get; set; }
 
     [Name("Code")]
-    public string Code { get; set; }
+    public string? Code { get; set; }
 
     [Name("Transactiereferentie")]
-    public string TransactionReference { get; set; }
+    public string? TransactionReference { get; set; }
 
     [Name("Omschrijving-1")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 }

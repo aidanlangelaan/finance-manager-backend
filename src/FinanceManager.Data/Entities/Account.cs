@@ -11,13 +11,13 @@ public class Account : AuditableEntity
 
     [Required]
     [Column(TypeName = "varchar(255)")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [Required]
     [Column(TypeName = "tinyint")]
     public AccountType Type { get; set; } = AccountType.Expense;
 
     // Relations
-    public virtual IEnumerable<Transaction> TransactionsFrom { get; set; }
-    public virtual IEnumerable<Transaction> TransactionsTo { get; set; }
+    public virtual IEnumerable<Transaction>? TransactionsFrom { get; set; }
+    public virtual IEnumerable<Transaction>? TransactionsTo { get; set; }
 }

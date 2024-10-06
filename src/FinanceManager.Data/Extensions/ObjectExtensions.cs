@@ -21,7 +21,7 @@ public static class ObjectExtensions
 
         if (property != null)
         {
-            return (T)property.GetValue(objectToCheck, null);
+            return (T)property.GetValue(objectToCheck, null)!;
         }
 
         return default(T);

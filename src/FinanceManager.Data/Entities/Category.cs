@@ -7,7 +7,7 @@ public class Category : AuditableEntity
 {
     [Required]
     [Column(TypeName = "varchar(255)")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
     
     [Column(TypeName = "varchar(255)")]
     public string? Description { get; set; }

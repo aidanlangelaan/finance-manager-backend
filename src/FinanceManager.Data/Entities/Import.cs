@@ -8,11 +8,11 @@ public class Import : AuditableEntity
 {
     [Required]
     [Column(TypeName = "varchar(255)")]
-    public string OriginalFileName { get; set; }
+    public string? OriginalFileName { get; set; }
     
     [Required]
     [Column(TypeName = "varchar(255)")]
-    public string TemporaryFileName { get; set; }
+    public string? TemporaryFileName { get; set; }
     
     [Required]
     [Column(TypeName = "tinyint")]
@@ -27,5 +27,5 @@ public class Import : AuditableEntity
     public ImportStatus Status { get; set; }
 
     // Relations
-    public virtual IEnumerable<Transaction> Transactions { get; set; }
+    public virtual IEnumerable<Transaction>? Transactions { get; set; }
 }

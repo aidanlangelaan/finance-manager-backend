@@ -2,7 +2,7 @@
 
 public class CsvImportResult
 {
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
 
     public int Imported { get; set; }
 

@@ -15,5 +15,5 @@ public abstract class AuditableEntity : EntityBase
     
     [Required]
     [Column(TypeName = "varchar(255)")]
-    public string Hash { get; set; }
+    public string? Hash { get; set; }
 }

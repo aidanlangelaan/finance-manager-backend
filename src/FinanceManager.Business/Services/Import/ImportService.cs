@@ -39,6 +39,11 @@ public class ImportService(
 
     public async Task<bool> SaveImportFile(ImportTransactionsDTO import)
     {
+        if (import.File == null)
+        {
+            return false;
+        }
+        
         // validate file
         var fileProvider = new FileExtensionContentTypeProvider();
         if (!fileProvider.TryGetContentType(import.File.FileName, out var contentType)
@@ -111,7 +116,7 @@ public class ImportService(
         try
         {
             // get file
-            var filePath = Path.Combine(Path.GetTempPath(), import.TemporaryFileName);
+            var filePath = Path.Combine(Path.GetTempPath(), import.TemporaryFileName ?? throw new InvalidOperationException());
             var lines = File.ReadLines(filePath).ToArray();
 
             // detect separator and setup reader configuration
@@ -187,7 +192,7 @@ public class ImportService(
     private static char DetectSeparator(string[] lines)
     {
         var q = SeparatorChars.Select(sep => new
-                { Separator = sep, Found = lines.GroupBy(line => line.Count(ch => ch == sep)) })
+        { Separator = sep, Found = lines.GroupBy(line => line.Count(ch => ch == sep)) })
             .OrderByDescending(res => res.Found.Count(grp => grp.Key > 0))
             .ThenBy(res => res.Found.Count())
             .FirstOrDefault();
@@ -204,8 +209,8 @@ public class ImportService(
     {
         var counterpartyAccount = await context.Accounts
             .FirstOrDefaultAsync(acc => (!string.IsNullOrEmpty(acc.Iban) && acc.Iban == record.CounterpartyIban) ||
-                                        acc.Name.Equals(record.CounterpartyName,
-                                            StringComparison.CurrentCultureIgnoreCase));
+                                        (acc.Name != null && acc.Name.Equals(record.CounterpartyName,
+                                            StringComparison.CurrentCultureIgnoreCase)));
         if (counterpartyAccount != null) return counterpartyAccount;
 
         counterpartyAccount = new Account()
@@ -242,7 +247,7 @@ public class ImportService(
             .Include(import => import.Transactions)
             .FirstOrDefaultAsync(i => i.Id == importId);
 
-        if (import == null)
+        if (import == null || import.Transactions == null || !import.Transactions.Any())
         {
             return;
         }
@@ -267,7 +272,7 @@ public class ImportService(
             }
 
             await transactionService.AssignCategoryToTransaction(new AssignCategoryToTransactionDTO
-                { TransactionId = transaction.Id, CategoryId = transaction.CategoryId, ApplyToSimilarTransactions = true });
+            { TransactionId = transaction.Id, CategoryId = transaction.CategoryId, ApplyToSimilarTransactions = true });
         }
     }
 }

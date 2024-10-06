@@ -36,13 +36,13 @@ public class Transaction : AuditableEntity
     
     // Foreign keys
     [ForeignKey("FromAccountId")]
-    public Account FromAccount { get; set; }
+    public Account? FromAccount { get; set; }
     
     [ForeignKey("ToAccountId")]
-    public Account ToAccount { get; set; }
+    public Account? ToAccount { get; set; }
     
     [ForeignKey("CategoryId")]
-    public Category Category { get; set; }
+    public Category? Category { get; set; }
     
     // Relations
     public virtual Import? Import { get; set; }

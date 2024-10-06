@@ -27,7 +27,7 @@ public class AuthenticationService(
 
     public async Task<bool> RegisterUser(RegisterUserDTO model)
     {
-        var existingUser = await userManager.FindByEmailAsync(model.EmailAddress);
+        var existingUser = await userManager.FindByEmailAsync(model.EmailAddress ?? throw new InvalidOperationException());
         if (existingUser != null)
         {
             return false;
@@ -42,7 +42,7 @@ public class AuthenticationService(
             LastName = model.LastName,
         };
 
-        var result = await userManager.CreateAsync(user, model.Password);
+        var result = await userManager.CreateAsync(user, model.Password ?? throw new InvalidOperationException());
         if (!result.Succeeded)
         {
             return false;
@@ -59,8 +59,8 @@ public class AuthenticationService(
 
     public async Task<AuthorizationTokenDTO?> LoginUser(LoginUserDTO model)
     {
-        var user = await userManager.FindByEmailAsync(model.EmailAddress);
-        if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
+        var user = await userManager.FindByEmailAsync(model.EmailAddress ?? throw new InvalidOperationException());
+        if (user == null || !await userManager.CheckPasswordAsync(user, model.Password ?? throw new InvalidOperationException()))
         {
             return null;
         }
@@ -104,9 +104,14 @@ public class AuthenticationService(
 
         try
         {
-            identity = await GetIdentityFromExpiredAccessToken(model.AccessToken);
+            identity = await GetIdentityFromExpiredAccessToken(model.AccessToken ?? throw new InvalidOperationException());
         }
         catch (SecurityTokenException)
+        {
+            return null;
+        }
+        
+        if (model.RefreshToken == null)
         {
             return null;
         }

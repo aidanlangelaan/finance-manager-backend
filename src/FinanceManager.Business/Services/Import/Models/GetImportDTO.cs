@@ -6,7 +6,7 @@ public class GetImportDTO
 {
     public int Id { get; set; }
 
-    public string OriginalFileName { get; set; }
+    public string? OriginalFileName { get; set; }
 
     public BankType BankType { get; set; }
     

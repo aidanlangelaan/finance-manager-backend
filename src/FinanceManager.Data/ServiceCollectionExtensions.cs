@@ -16,9 +16,18 @@ public static class ServiceCollectionExtensions
             }),
             ServiceLifetime.Singleton);
 
-        services.AddIdentity<User, Role>()
+        services.AddIdentityCore<User>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+            })
+            .AddRoles<Role>()
             .AddEntityFrameworkStores<FinanceManagerDbContext>()
-            .AddDefaultTokenProviders();
+            .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider)
+            .AddTokenProvider<EmailTokenProvider<User>>("Email");
 
         return services;
     }

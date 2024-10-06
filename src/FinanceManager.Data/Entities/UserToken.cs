@@ -11,7 +11,7 @@ public class UserToken : IdentityUserToken<Guid>
     [Column(TypeName = "longtext")]
     [ProtectedPersonalData]
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
-    public string RefreshToken { get; set; }
+    public string? RefreshToken { get; set; }
     
     [Required]
     [Column(TypeName = "datetime")]

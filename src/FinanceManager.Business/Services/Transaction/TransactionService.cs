@@ -80,7 +80,7 @@ public class TransactionService(FinanceManagerDbContext context, IMapper mapper)
                 .Include(x => x.ToAccount)
                 .Where(FuzzyTransactionLookupClause(transaction))
                 .ToListAsync();
-            
+
             if (transactions.Count > 0)
             {
                 transactions.ForEach(x => { x.CategoryId = category.Id; });
@@ -98,13 +98,17 @@ public class TransactionService(FinanceManagerDbContext context, IMapper mapper)
     public Expression<Func<Transaction, bool>> FuzzyTransactionLookupClause(Transaction transaction) =>
         t => t.Id != transaction.Id &&
              // from iban not empty and both from-iban and from-name match
-             (t.FromAccount.Iban != null && t.FromAccount.Iban.Equals(transaction.FromAccount.Iban) &&
-              t.FromAccount.Name.Equals(transaction.FromAccount.Name)
+             (t.FromAccount != null && t.FromAccount.Iban != null && transaction.FromAccount != null &&
+              t.FromAccount.Iban.Equals(transaction.FromAccount.Iban) &&
+              t.FromAccount.Name != null && t.FromAccount.Name.Equals(transaction.FromAccount.Name)
               // to iban not empty and both to-iban and to-name match
-              && t.ToAccount.Iban != null && t.ToAccount.Iban.Equals(transaction.ToAccount.Iban) &&
-              t.ToAccount.Name.Equals(transaction.ToAccount.Name)
+              && t.ToAccount != null && t.ToAccount.Iban != null && transaction.ToAccount != null &&
+              t.ToAccount.Iban.Equals(transaction.ToAccount.Iban) &&
+              t.ToAccount.Name != null && t.ToAccount.Name.Equals(transaction.ToAccount.Name)
               // from iban empty but both from-iban and from-name match
-              || (t.FromAccount.Iban == null && t.FromAccount.Name.Equals(transaction.FromAccount.Name))
+              || (t.FromAccount != null && t.FromAccount.Iban == null && t.FromAccount.Name != null &&
+                  transaction.FromAccount != null && t.FromAccount.Name.Equals(transaction.FromAccount.Name))
               // to iban empty but both to-iban and to-name match
-              || t.ToAccount.Iban == null && t.ToAccount.Name.Equals(transaction.ToAccount.Name));
+              || t.ToAccount != null && t.ToAccount.Iban == null && t.ToAccount.Name != null &&
+              transaction.ToAccount != null && t.ToAccount.Name.Equals(transaction.ToAccount.Name));
 }

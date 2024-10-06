@@ -91,8 +91,13 @@ public static class ModelBuilderExtensions
         }
     }
 
-    private static void SetDefaultValuesForProperties(EntityTypeBuilder entityTypeBuilder)
+    private static void SetDefaultValuesForProperties(EntityTypeBuilder? entityTypeBuilder)
     {
+        if (entityTypeBuilder == null)
+        {
+            return;
+        }
+        
         var rowVersionProperty = entityTypeBuilder.Metadata.ClrType.GetProperty("RowVersion");
         if (rowVersionProperty != null && rowVersionProperty.PropertyType == typeof(DateTime))
         {

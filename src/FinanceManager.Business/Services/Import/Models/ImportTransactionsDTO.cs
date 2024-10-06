@@ -5,7 +5,7 @@ namespace FinanceManager.Business.Services.Models;
 
 public class ImportTransactionsDTO
 {
-    public IFormFile File { get; init; }
+    public IFormFile? File { get; init; }
     
     public BankType Bank { get; init; }
     
