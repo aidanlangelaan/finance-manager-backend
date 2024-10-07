@@ -31,10 +31,4 @@
       <HintPath>..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.8\Microsoft.AspNetCore.Identity.dll</HintPath>
     </Reference>
   </ItemGroup>
-    
-  <ItemGroup>
-    <Compile Remove="Migrations\20241006214851_test.cs" />
-    <Compile Remove="Migrations\20241006214851_test.Designer.cs" />
-  </ItemGroup>
-    
 </Project>

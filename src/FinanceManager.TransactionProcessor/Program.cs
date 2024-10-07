@@ -1,6 +1,7 @@
 using FinanceManager.Api.Configurations;
 using FinanceManager.Business;
 using FinanceManager.Business.configurations;
+using FinanceManager.Business.Exceptions;
 using FinanceManager.Data;
 using FinanceManager.TransactionProcessor;
 using Serilog;
@@ -36,7 +37,7 @@ try
         {
             services.AddHostedService<Worker>();
             services.ConfigureDataServices(configuration["ConnectionStrings:FinanceManagerContext"] ??
-                                           throw new InvalidOperationException("Connection string can't be empty"));
+                                           throw new ConfigurationException("Connection string can't be empty"));
             services.ConfigureApplicationServices();
             services.AddAutoMapper(typeof(TransactionViewModelMapperProfile), typeof(TransactionMapperProfile));
         });

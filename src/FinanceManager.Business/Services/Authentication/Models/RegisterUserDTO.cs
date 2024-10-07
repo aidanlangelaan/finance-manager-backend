@@ -2,11 +2,9 @@
 
 public class RegisterUserDTO
 {
-    public string? FirstName { get; init; }
+    public string FirstName { get; init; } = null!;
 
-    public string? LastName { get; init; }
+    public string LastName { get; init; } = null!;
 
-    public string? EmailAddress { get; init; }
-
-    public string? Password { get; init; }
+    public string EmailAddress { get; init; } = null!;
 }

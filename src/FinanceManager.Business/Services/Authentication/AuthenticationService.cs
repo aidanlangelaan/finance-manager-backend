@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
+using FinanceManager.Business.Exceptions;
 using FinanceManager.Business.Utils;
 using FinanceManager.Data;
 using FinanceManager.Data.Enums;
 using FinanceManager.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace FinanceManager.Business.Services;
@@ -20,76 +21,163 @@ public class AuthenticationService(
     IConfiguration configuration,
     FinanceManagerDbContext context,
     UserManager<User> userManager,
-    RoleManager<Role> roleManager)
+    RoleManager<Role> roleManager,
+    ILogger<AuthenticationService> logger,
+    ISmtpEmailService emailService)
     : IAuthenticationService
 {
     private const string SALT_SETTINGS_KEY = "Security:Salt";
+    private const string AUTHENTICATION_LOGIN_PROVIDER_SETTINGS_KEY = "Authentication:LoginProvider";
 
-    public async Task<bool> RegisterUser(RegisterUserDTO model)
+    public async Task<IdentityResult> CreateUser(RegisterUserDTO model)
     {
-        var existingUser = await userManager.FindByEmailAsync(model.EmailAddress ?? throw new InvalidOperationException());
-        if (existingUser != null)
+        try
         {
-            return false;
+            var existingUser = await userManager.FindByEmailAsync(model.EmailAddress);
+            if (existingUser != null)
+            {
+                logger.LogWarning("Attempt to register with an existing email: {Email}", model.EmailAddress);
+                return IdentityResult.Failed(new IdentityError
+                    { Description = "Registration failed. Please try again." });
+            }
+
+            var user = new User()
+            {
+                UserName = model.EmailAddress,
+                Email = model.EmailAddress,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                EmailConfirmed = false,
+                LockoutEnabled = true,
+            };
+
+            var result = await userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                logger.LogError("Failed to create user: {Errors}",
+                    string.Join(", ", result.Errors.Select(e => e.Description)));
+                return result;
+            }
+
+            // give all users the user role by default
+            var roleName = Roles.User.StringValue();
+            if (await roleManager.RoleExistsAsync(roleName))
+            {
+                var roleResult = await userManager.AddToRoleAsync(user, roleName);
+                if (!roleResult.Succeeded)
+                {
+                    logger.LogError("Failed to add user to role '{Role}': {Errors}", roleName,
+                        string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                    return roleResult;
+                }
+            }
+
+            // Generate and store the email confirmation token
+            var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            await userManager.SetAuthenticationTokenAsync(user,
+                configuration[AUTHENTICATION_LOGIN_PROVIDER_SETTINGS_KEY] ?? TokenOptions.DefaultProvider, "EmailConfirmation", confirmationToken);
+
+            // Generate the confirmation link and send mail
+            var confirmationLink = GenerateEmailConfirmationLink(confirmationToken);
+            await emailService.SendEmailAsync(user.Email, "Confirm your email address",
+                $"Please confirm your email by clicking the following link: {confirmationLink}");
+
+            logger.LogInformation("User registered successfully and confirmation email sent to {Email}", user.Email);
+
+            return IdentityResult.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An unexpected error occurred during user registration.");
+            return IdentityResult.Failed(new IdentityError
+                { Description = "An error occurred while processing your request. Please try again later." });
+        }
+    }
+
+    public async Task<IdentityResult> ConfirmEmailAddress(ConfirmEmailAddressDTO model)
+    {
+        // Find the associated user
+        var userToken = await context.UserTokens
+            .SingleOrDefaultAsync(ut =>
+                ut.LoginProvider == (configuration[AUTHENTICATION_LOGIN_PROVIDER_SETTINGS_KEY] ?? TokenOptions.DefaultProvider) &&
+                ut.Name == "EmailConfirmation" &&
+                ut.Value == model.Token);
+
+        if (userToken == null)
+        {
+            logger.LogWarning("Invalid or expired email confirmation token.");
+            return IdentityResult.Failed(new IdentityError { Description = "Invalid confirmation token." });
         }
 
-        var user = new User()
+        // Retrieve the user using the UserId from the token entry
+        var user = await userManager.FindByIdAsync(userToken.UserId.ToString());
+        if (user == null)
         {
-            Email = model.EmailAddress,
-            SecurityStamp = Guid.NewGuid().ToString(),
-            UserName = model.EmailAddress,
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-        };
-
-        var result = await userManager.CreateAsync(user, model.Password ?? throw new InvalidOperationException());
-        if (!result.Succeeded)
-        {
-            return false;
+            logger.LogWarning("User not found for the provided email confirmation token.");
+            return IdentityResult.Failed(new IdentityError { Description = "Invalid confirmation token." });
         }
 
-        // give all users the user role by default
-        if (await roleManager.RoleExistsAsync(Roles.User.StringValue()))
+        // Verify the token for the user
+        var isTokenValid =
+            await userManager.VerifyUserTokenAsync(user, TokenOptions.DefaultProvider, "EmailConfirmation",
+                model.Token);
+        if (!isTokenValid)
         {
-            await userManager.AddToRoleAsync(user, Roles.User.StringValue());
+            logger.LogWarning("Token verification failed.");
+            return IdentityResult.Failed(new IdentityError { Description = "Invalid or expired confirmation token." });
         }
 
-        return true;
+        // Step 4: Confirm the user's email
+        var result = await userManager.ConfirmEmailAsync(user, model.Token);
+        if (result.Succeeded)
+        {
+            logger.LogInformation("Email successfully confirmed for user: {UserId}", user.Id);
+        }
+        else
+        {
+            logger.LogError("Email confirmation failed for user: {UserId}", user.Id);
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> ResetPassword(ResetPasswordDTO model)
+    {
+        var userToken = await context.UserTokens
+            .SingleOrDefaultAsync(ut =>
+                ut.LoginProvider == (configuration[AUTHENTICATION_LOGIN_PROVIDER_SETTINGS_KEY] ?? TokenOptions.DefaultProvider) &&
+                ut.Name == "ResetPassword" &&
+                ut.Value == model.Token);
+
+        if (userToken == null)
+        {
+            throw new InvalidTokenException("Invalid password reset token.");
+        }
+
+        var user = await userManager.FindByIdAsync(userToken.UserId.ToString());
+        if (user == null)
+        {
+            throw new UserNotFoundException("User not found.");
+        }
+
+        return await userManager.ResetPasswordAsync(user, model.Token, model.Password);
     }
 
     public async Task<AuthorizationTokenDTO?> LoginUser(LoginUserDTO model)
     {
-        var user = await userManager.FindByEmailAsync(model.EmailAddress ?? throw new InvalidOperationException());
-        if (user == null || !await userManager.CheckPasswordAsync(user, model.Password ?? throw new InvalidOperationException()))
+        var user = await userManager.FindByEmailAsync(model.EmailAddress);
+        if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
         {
-            return null;
+            throw new UserNotFoundException("User not found.");
         }
 
-        var accessToken = await GenerateAccessToken(user);
+        var accessToken = GenerateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
 
-        var existingToken = await context.UserTokens
-            .FirstOrDefaultAsync(t => t.LoginProvider == configuration["Authentication:LoginProvider"]
-                                      && t.UserId == user.Id
-                                      && t.Name == user.NormalizedUserName);
-        if (existingToken != null)
-        {
-            context.UserTokens.Remove(existingToken);
-        }
-
-        await context.UserTokens.AddAsync(new UserToken
-        {
-            UserId = user.Id,
-            LoginProvider = configuration["Authentication:LoginProvider"] ?? string.Empty,
-            Name = user.NormalizedEmail!,
-            Value = SecurityUtils.HashValue(accessToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty),
-            RefreshToken = SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty),
-            RefreshTokenExpiresOnAt =
-                DateTime.UtcNow.AddMinutes(
-                    Convert.ToDouble(configuration["Authentication:RefreshTokenExpirationInMinutes"]))
-        });
-
-        await context.SaveChangesAsync();
+        await userManager.SetAuthenticationTokenAsync(user,
+            configuration[AUTHENTICATION_LOGIN_PROVIDER_SETTINGS_KEY] ?? TokenOptions.DefaultProvider,
+            "RefreshToken",
+            SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty));
 
         return new AuthorizationTokenDTO
         {
@@ -100,50 +188,33 @@ public class AuthenticationService(
 
     public async Task<AuthorizationTokenDTO?> RefreshAccessToken(RefreshAccessTokenDTO model)
     {
-        string identity;
-
-        try
-        {
-            identity = await GetIdentityFromExpiredAccessToken(model.AccessToken ?? throw new InvalidOperationException());
-        }
-        catch (SecurityTokenException)
-        {
-            return null;
-        }
-        
-        if (model.RefreshToken == null)
-        {
-            return null;
-        }
+        var hashedRefreshToken =
+            SecurityUtils.HashValue(model.RefreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty);
 
         var userToken = await context.UserTokens
-            .FirstOrDefaultAsync(t =>
-                t.Value == SecurityUtils.HashValue(model.AccessToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty)
-                && t.RefreshToken == SecurityUtils.HashValue(model.RefreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty)
-                && t.LoginProvider == configuration["Authentication:LoginProvider"]
-                && t.Name == identity);
+            .SingleOrDefaultAsync(ut =>
+                ut.LoginProvider == (configuration[AUTHENTICATION_LOGIN_PROVIDER_SETTINGS_KEY] ?? TokenOptions.DefaultProvider) &&
+                ut.Name == "RefreshToken" &&
+                ut.Value == hashedRefreshToken);
+
         if (userToken == null)
         {
-            return null;
+            throw new InvalidTokenException("Invalid refresh token.");
         }
 
-        if (userToken.RefreshTokenExpiresOnAt < DateTime.UtcNow)
+        var user = await userManager.FindByIdAsync(userToken.UserId.ToString());
+        if (user == null)
         {
-            return null;
+            throw new UserNotFoundException("User not found.");
         }
 
-        var user = await context.Users.FindAsync(userToken.UserId);
-        var accessToken = await GenerateAccessToken(user!);
+        var accessToken = GenerateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
 
-        // hash the tokens
-        userToken.Value = SecurityUtils.HashValue(accessToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty);
-        userToken.RefreshToken = SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty);
-        userToken.RefreshTokenExpiresOnAt =
-            DateTime.UtcNow.AddMinutes(
-                Convert.ToDouble(configuration["Authentication:RefreshTokenExpirationInMinutes"]));
-
-        await context.SaveChangesAsync();
+        await userManager.SetAuthenticationTokenAsync(user,
+            configuration[AUTHENTICATION_LOGIN_PROVIDER_SETTINGS_KEY] ?? TokenOptions.DefaultProvider,
+            "RefreshToken",
+            SecurityUtils.HashValue(refreshToken, configuration[SALT_SETTINGS_KEY] ?? string.Empty));
 
         return new AuthorizationTokenDTO
         {
@@ -152,77 +223,42 @@ public class AuthenticationService(
         };
     }
 
-    private async Task<string> GenerateAccessToken(User user)
+    private string GenerateEmailConfirmationLink(string token)
     {
+        var baseUrl = configuration["ApplicationSettings:FrontendBaseUrl"];
+        var confirmationPath = configuration["ApplicationSettings:EmailConfirmationPath"];
+        var encodedToken = Uri.EscapeDataString(token);
+        return $"{baseUrl}{confirmationPath}?token={encodedToken}";
+    }
+
+    private string GenerateAccessToken(User user)
+    {
+        var tokenHandler = new JsonWebTokenHandler();
+        var key = Encoding.ASCII.GetBytes(configuration["Authentication:Secret"] ??
+                                          throw new ConfigurationException("Authentication Secret can't be null"));
         var issuingOnAt = DateTimeOffset.UtcNow;
         var expiringOnAt =
             issuingOnAt.AddMinutes(Convert.ToDouble(configuration["Authentication:AccessTokenExpirationInMinutes"]));
 
-        var authClaims = new Dictionary<string, object>
-        {
-            [JwtRegisteredClaimNames.Sub] =
-                user.NormalizedUserName ?? throw new InvalidOperationException("Username can't be empty"),
-            [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
-            [JwtRegisteredClaimNames.Iat] = issuingOnAt.ToUnixTimeSeconds().ToString(),
-            [JwtRegisteredClaimNames.Exp] = expiringOnAt.ToUnixTimeSeconds().ToString()
-        };
-
-        var userRoles = await userManager.GetRolesAsync(user);
-        foreach (var role in userRoles)
-        {
-            authClaims.Add(ClaimTypes.Role, role);
-        }
-
-        var authSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(configuration["Authentication:Secret"] ??
-                                   throw new InvalidOperationException("Secret can't be empty")));
-
-        var descriptor = new SecurityTokenDescriptor
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = configuration["Authentication:ValidIssuer"],
             Audience = configuration["Authentication:ValidAudience"],
+            Subject = new ClaimsIdentity([
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email!)
+            ]),
             Expires = expiringOnAt.UtcDateTime,
-            Claims = authClaims,
-            SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            SigningCredentials =
+                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
-        var handler = new JsonWebTokenHandler
-        {
-            SetDefaultTimesOnTokenCreation = false
-        };
-
-        return handler.CreateToken(descriptor);
+        return tokenHandler.CreateToken(tokenDescriptor);
     }
 
     private static string GenerateRefreshToken()
     {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
-    }
-
-    private async Task<string> GetIdentityFromExpiredAccessToken(string accessToken)
-    {
-        var tokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidAudience = configuration["Authentication:ValidAudience"],
-            ValidateIssuer = true,
-            ValidIssuer = configuration["Authentication:ValidIssuer"],
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                configuration["Authentication:Secret"] ??
-                throw new InvalidOperationException("Secret can't be empty"))),
-        };
-
-        var tokenHandler = new JsonWebTokenHandler();
-        var result = await tokenHandler.ValidateTokenAsync(accessToken, tokenValidationParameters);
-        if (!result.IsValid)
-        {
-            throw new SecurityTokenException("Invalid token");
-        }
-
-        return result.Claims[JwtRegisteredClaimNames.Sub].ToString()!;
+        var refreshToken = Guid.NewGuid().ToString();
+        return refreshToken;
     }
 }

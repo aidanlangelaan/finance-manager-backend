@@ -6,6 +6,7 @@ using FinanceManager.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FinanceManager.Business.Exceptions;
 using NSwag;
 
 namespace FinanceManager.Api;
@@ -19,7 +20,7 @@ public class Startup(IConfiguration configuration)
     {
         // Setup dependency injection
         services.ConfigureDataServices(Configuration["ConnectionStrings:FinanceManagerContext"] ??
-                                       throw new InvalidOperationException("Connection string can't be empty"))
+                                       throw new ConfigurationException("Connection string can't be empty"))
             .ConfigureApplicationServices();
 
         // Adding Authentication  
@@ -43,7 +44,7 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                         Configuration["Authentication:Secret"] ??
-                        throw new InvalidOperationException("Secret can't be empty"))),
+                        throw new ConfigurationException("Authentication secret can't be empty"))),
                     ValidateLifetime = true,
                     LifetimeValidator = TokenLifetimeValidator.Validate
                 };
@@ -87,6 +88,8 @@ public class Startup(IConfiguration configuration)
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         // Add OpenAPI 3.0 document serving middleware
         // Available at: http://localhost:<port>/swagger/v1/swagger.json

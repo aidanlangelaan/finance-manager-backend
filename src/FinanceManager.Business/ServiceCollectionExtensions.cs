@@ -13,5 +13,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ICategoryService, CategoryService>();
         services.AddTransient<IImportService, ImportService>();
         services.AddTransient<ITransactionService, TransactionService>();
+        services.AddSingleton<ISmtpEmailService, SmtpEmailService>();
     }
 }

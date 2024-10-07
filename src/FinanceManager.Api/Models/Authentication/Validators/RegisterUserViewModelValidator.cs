@@ -6,9 +6,8 @@ public class RegisterUserViewModelValidator : AbstractValidator<RegisterUserView
 {
     public RegisterUserViewModelValidator()
     {
-        RuleFor(register => register.FirstName).NotEmpty();
-        RuleFor(register => register.LastName).NotEmpty();
-        RuleFor(register => register.EmailAddress).NotEmpty();
-        RuleFor(register => register.Password).NotEmpty();
+        RuleFor(model => model.FirstName).NotEmpty();
+        RuleFor(model => model.LastName).NotEmpty();
+        RuleFor(model => model.EmailAddress).NotEmpty().EmailAddress();
     }
 }

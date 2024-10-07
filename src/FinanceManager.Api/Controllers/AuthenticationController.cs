@@ -27,18 +27,69 @@ public class AuthenticationController(IAuthenticationService authenticationServi
     /// <response code="400">Failed to process request or failed to register user</response>
     [HttpPost]
     [Route("register")]
-    [ProducesResponseType(typeof(AuthorizationTokenViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegisterUser(RegisterUserViewModel model)
     {
-        var result = await authenticationService.RegisterUser(mapper.Map<RegisterUserDTO>(model));
-        if (!result)
-        {
-            return BadRequest("User already exists or failed to register");
-        }
+        await authenticationService.CreateUser(mapper.Map<RegisterUserDTO>(model));
+
+        // always return OK to prevent user enumeration
         return Ok();
     }
-    
+
+    /// <summary>
+    /// Confirms the users email address
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /api/authentication/confirm-email
+    ///
+    /// </remarks>
+    /// <response code="200">The email address for the user has been confirmed</response>
+    /// <response code="400">Failed to process request or failed to confirm the users email address</response>
+    [HttpPost]
+    [Route("confirm-email")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ConfirmEmailAddress(ConfirmEmailAddressViewModel model)
+    {
+        var result = await authenticationService.ConfirmEmailAddress(mapper.Map<ConfirmEmailAddressDTO>(model));
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(new { Message = "Invalid or expired confirmation token." });
+        }
+
+        return Ok(new { Message = "Email confirmed successfully." });
+    }
+
+    /// <summary>
+    /// Sets the password for a user
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /api/authentication/set-password
+    ///
+    /// </remarks>
+    /// <response code="200">The password for a user has been updated</response>
+    /// <response code="400">Failed to process request or failed to set users password</response>
+    [HttpPost]
+    [Route("set-password")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        var result = await authenticationService.ResetPassword(mapper.Map<ResetPasswordDTO>(model));
+        if (!result.Succeeded)
+        {
+            return BadRequest(new { Message = "Failed to reset password. Please check the details and try again." });
+        }
+
+        return Ok("Password has been successfully reset.");
+    }
+
     /// <summary>
     /// Login the user to retrieve their JWT token
     /// </summary>
@@ -64,16 +115,17 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         {
             return Unauthorized();
         }
+
         return Ok(mapper.Map<AuthorizationTokenViewModel>(token));
     }
-    
+
     /// <summary>
     /// Refresh the users access token using the provided refresh token
     /// </summary>
     /// <remarks>
     /// Sample request:
     ///
-    ///     POST /api/authentication/refresh
+    ///     POST /api/authentication/refresh-token
     ///
     /// </remarks>
     /// <returns>An authentication token</returns>
@@ -81,7 +133,7 @@ public class AuthenticationController(IAuthenticationService authenticationServi
     /// <response code="401">User invalid, not found or existing refresh token has expired</response>
     /// <response code="400">Failed to process request</response>
     [HttpPost]
-    [Route("refresh")]
+    [Route("refresh-token")]
     [ProducesResponseType(typeof(AuthorizationTokenViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
@@ -92,6 +144,7 @@ public class AuthenticationController(IAuthenticationService authenticationServi
         {
             return Unauthorized();
         }
+
         return Ok(mapper.Map<AuthorizationTokenViewModel>(token));
     }
 }

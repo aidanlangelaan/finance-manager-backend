@@ -6,7 +6,7 @@ public class LoginUserViewModelValidator : AbstractValidator<LoginUserViewModel>
 {
     public LoginUserViewModelValidator()
     {
-        RuleFor(login => login.EmailAddress).NotEmpty();
-        RuleFor(login => login.Password).NotEmpty();
+        RuleFor(model => model.EmailAddress).NotEmpty().EmailAddress();
+        RuleFor(model => model.Password).NotEmpty();
     }
 }
