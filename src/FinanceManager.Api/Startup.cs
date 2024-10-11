@@ -6,7 +6,10 @@ using FinanceManager.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FinanceManager.Api.Identity;
 using FinanceManager.Business.Exceptions;
+using FinanceManager.Data.Entities;
+using Microsoft.AspNetCore.Identity;
 using NSwag;
 
 namespace FinanceManager.Api;
@@ -49,7 +52,25 @@ public class Startup(IConfiguration configuration)
                     LifetimeValidator = TokenLifetimeValidator.Validate
                 };
             });
+        
+        services.AddIdentity<User, Role>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+            })
+            .AddEntityFrameworkStores<FinanceManagerDbContext>()
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<DataProtectorTokenProvider<User>>("RefreshTokenProviderOptions")
+            .AddTokenProvider<DataProtectorTokenProvider<User>>("EmailConfirmationTokenProvider")
+            .AddTokenProvider<DataProtectorTokenProvider<User>>("PasswordResetTokenProvider");
 
+        services.ConfigureOptions<RefreshTokenProviderOptions>();
+        services.ConfigureOptions<EmailConfirmationTokenProviderOptions>();
+        services.ConfigureOptions<PasswordResetTokenProviderOptions>();
+        
         services.AddControllers();
 
         services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));

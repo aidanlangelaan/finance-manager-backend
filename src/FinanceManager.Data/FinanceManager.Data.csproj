@@ -25,10 +25,4 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
   </ItemGroup>
-    
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Identity">
-      <HintPath>..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.8\Microsoft.AspNetCore.Identity.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>

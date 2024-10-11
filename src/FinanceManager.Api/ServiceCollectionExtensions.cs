@@ -2,7 +2,6 @@
 using FinanceManager.Api.Utils.Interceptors;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FinanceManager.Api;
 
