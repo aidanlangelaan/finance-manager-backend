@@ -15,13 +15,9 @@ public interface IAuthenticationService
     
     Task<IdentityResult> ResetPassword(ResetPasswordDTO model);
     
-    // Task<IdentityResult> ChangePassword(ChangePasswordDTO model);
-    
     Task<AuthorizationTokenDTO?> LoginUser(LoginUserDTO model);
     
     Task<AuthorizationTokenDTO?> RefreshAccessToken(RefreshAccessTokenDTO model);
 
-    // Task LogoutUser(string userId);
-
-    // Task RevokeRefreshToken(RevokeRefreshTokenDTO model);
+    Task<IdentityResult> LogoutUser(LogoutUserDTO model);
 }

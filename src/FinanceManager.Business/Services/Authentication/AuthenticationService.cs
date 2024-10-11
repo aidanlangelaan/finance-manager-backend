@@ -397,6 +397,46 @@ public class AuthenticationService(
         };
     }
 
+    /// <summary>
+    /// Logs out the user by invalidating all active refresh tokens associated with the user.
+    /// Ensures that any existing tokens cannot be used to refresh access tokens after logout.
+    /// </summary>
+    /// <param name="model">An object containing the user's ID.</param>
+    /// <returns>
+    /// An <see cref="IdentityResult"/> object representing the outcome of the logout process.
+    /// Returns a success result if all tokens are invalidated successfully.
+    /// Returns a failure result if the user is not found or if the logout process fails.
+    /// </returns>
+    public async Task<IdentityResult> LogoutUser(LogoutUserDTO model)
+    {
+        logger.LogInformation("Logout request received for user ID: {UserId}", model.UserId);
+
+        // Retrieve the user by ID
+        var user = await userManager.FindByIdAsync(model.UserId);
+        if (user == null)
+        {
+            logger.LogError("User not found for ID: {UserId}", model.UserId);
+            throw new UserNotFoundException("User not found.");
+        }
+
+        // Invalidate all refresh tokens for the user by removing them from the database
+        var userTokens = context.UserTokens.Where(ut => ut.UserId == user.Id && ut.LoginProvider == "RefreshTokenProvider");
+
+        context.UserTokens.RemoveRange(userTokens);
+
+        try
+        {
+            await context.SaveChangesAsync();
+            logger.LogInformation("Successfully invalidated all refresh tokens for user ID: {UserId}", model.UserId);
+            return IdentityResult.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while invalidating tokens for user ID: {UserId}", model.UserId);
+            return IdentityResult.Failed(new IdentityError { Description = "An error occurred while logging out. Please try again." });
+        }
+    }
+    
     private string GenerateEmailConfirmationLink(string token)
     {
         var baseUrl = configuration["ApplicationSettings:FrontendBaseUrl"];
