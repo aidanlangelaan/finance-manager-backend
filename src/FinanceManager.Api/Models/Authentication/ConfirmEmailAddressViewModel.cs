@@ -2,5 +2,5 @@
 
 public class ConfirmEmailAddressViewModel
 {
-    public string Token { get; set; } = null!;
+    public string Token { get; init; } = null!;
 }

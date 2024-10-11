@@ -1,8 +1,6 @@
 ﻿namespace FinanceManager.Api.Models;
 
-public class LoginUserViewModel
+public class RefreshAccessTokenViewModel
 {
     public string EmailAddress { get; init; } = null!;
-
-    public string Password { get; init; } = null!;
 }

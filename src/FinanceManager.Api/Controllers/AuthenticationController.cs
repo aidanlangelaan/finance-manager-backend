@@ -4,6 +4,7 @@ using FinanceManager.Business.Interfaces;
 using FinanceManager.Business.Services.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 
 namespace FinanceManager.Api.Controllers;
 
@@ -15,26 +16,39 @@ public class AuthenticationController(IAuthenticationService authenticationServi
     : ControllerBase
 {
     /// <summary>
-    /// Register a new user
+    /// Register a new user.
     /// </summary>
     /// <remarks>
     /// Sample request:
     ///
     ///     POST /api/authentication/register
+    ///     {
+    ///         "firstName": "John",
+    ///         "lastName": "Doe",
+    ///         "emailAddress": "john.doe@example.com"
+    ///     }
     ///
+    /// Request Body:
+    /// - **firstName**: The first name of the user (required).
+    /// - **lastName**: The last name of the user (required).
+    /// - **emailAddress**: The user's email address (required).
     /// </remarks>
-    /// <response code="200">User has been created</response>
-    /// <response code="400">Failed to process request or failed to register user</response>
+    /// <response code="201">User has been created successfully, and the account is pending email confirmation.</response>
+    /// <response code="400">Failed to process the request due to validation errors or other issues (e.g., duplicate email).</response>
     [HttpPost]
     [Route("register")]
-    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegisterUser(RegisterUserViewModel model)
     {
-        await authenticationService.CreateUser(mapper.Map<RegisterUserDTO>(model));
+        var result = await authenticationService.CreateUser(mapper.Map<RegisterUserDTO>(model));
+        if (result.Succeeded)
+        {
+            // always return success code to prevent user enumeration
+            return StatusCode(StatusCodes.Status201Created);
+        }
 
-        // always return OK to prevent user enumeration
-        return Ok();
+        return BadRequest(new { Message = "Failed to register user. Please try again later." });
     }
 
     /// <summary>

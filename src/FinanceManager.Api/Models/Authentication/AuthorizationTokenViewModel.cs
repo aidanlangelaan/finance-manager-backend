@@ -2,6 +2,6 @@
 
 public class AuthorizationTokenViewModel
 {
-    public string? AccessToken { get; init; }
-    public string? RefreshToken { get; init; }
+    public string AccessToken { get; init; } = null!;
+    public string RefreshToken { get; init; } = null!;
 }

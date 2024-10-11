@@ -14,13 +14,16 @@ public class AuthenticationViewModelMapperProfile : Profile
     private void CreateViewModelMapping()
     {
         // ViewModel --> DTO 
-        CreateMap<LoginUserViewModel, LoginUserDTO>();
         CreateMap<RegisterUserViewModel, RegisterUserDTO>();
-        CreateMap<AuthorizationTokenViewModel, RefreshAccessTokenDTO>();
+        CreateMap<ResendEmailConfirmationViewModel, ResendEmailConfirmationDTO>();
+        CreateMap<ConfirmEmailAddressViewModel, ConfirmEmailAddressDTO>();
+        CreateMap<ForgotPasswordViewModel, ForgotPasswordDTO>();
+        CreateMap<ResetPasswordViewModel, ResetPasswordDTO>();
+        CreateMap<ResetPasswordViewModel, ResetPasswordDTO>();
+        CreateMap<LoginUserViewModel, LoginUserDTO>();
+        CreateMap<RefreshAccessTokenViewModel, RefreshAccessTokenDTO>();
         
         // DTO --> ViewModel
         CreateMap<AuthorizationTokenDTO, AuthorizationTokenViewModel>();
-        
-        
     }
 }

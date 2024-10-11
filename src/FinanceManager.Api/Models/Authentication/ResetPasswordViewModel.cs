@@ -2,7 +2,7 @@
 
 public class ResetPasswordViewModel
 {
-    public string Password { get; set; } = null!;
+    public string Password { get; init; } = null!;
 
-    public string Token { get; set; } = null!;
+    public string Token { get; init; } = null!;
 }
