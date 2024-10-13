@@ -411,6 +411,13 @@ public class AuthenticationService(
     {
         logger.LogInformation("Logout request received for user ID: {UserId}", model.UserId);
 
+        // Check for a valid user ID
+        if (model.UserId == null)
+        {
+            logger.LogError("User ID is null in logout request.");
+            return IdentityResult.Failed(new IdentityError { Description = "Invalid user ID." });
+        }
+        
         // Retrieve the user by ID
         var user = await userManager.FindByIdAsync(model.UserId);
         if (user == null)

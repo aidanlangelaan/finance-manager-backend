@@ -13,12 +13,8 @@ These are things that still need doing or can be improved on.
 - Hash creation and checks for transactions to prevent the creation of duplicate transactions
   - When importing show user how many rows imported successful, how many duplicate and how many failed
 - Authentication
-  - Check automapper configs
   - Update user on email confirmation (email conf, unlock, security hash?)
-  - Check on expiration of tokens (configuration in startup)
-  - Implement password reset
-  - Implement logout
-  - Handle case where user hasn't confirmed emailaddress on time (before token expiration)
+  - Check on expiration of tokens
   - rate limiting for authentication endpoints or in general
 - Category matching
   - Figure out a more accurate way to identify similar transactions with fuzzy matching of description

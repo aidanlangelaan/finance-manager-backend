@@ -2,5 +2,5 @@
 
 public class LogoutUserDTO
 {
-    public string UserId { get; init; } = null!;
+    public string? UserId { get; init; }
 }
