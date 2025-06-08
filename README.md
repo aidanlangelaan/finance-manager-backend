@@ -2,6 +2,8 @@
 
 A self-hosted and privacy-focused application to help individuals manage their personal finances. This app allows users to manage accounts and transactions, categorize spending, and gain insights through reports and dashboards.
 
+ℹ️ The frontend (Angular) repository is separate and connects to this API.
+
 ## 🔧 Features
 
 - 💳 Manage your bank and expense accounts

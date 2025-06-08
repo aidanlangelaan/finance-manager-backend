@@ -15,7 +15,7 @@ public class AppDbContext : DbContext
     
     public DbSet<Account> Accounts;
     public DbSet<Transaction> Transactions;
-    public DbSet<UserProfile> UserProfile;
+    public DbSet<UserProfile> UserProfiles;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
