@@ -6,12 +6,23 @@ namespace FinanceManager.Domain.Entities;
 public class AuditableEntity : EntityBase
 {
     [Required]
+    [Column(TypeName = "datetime")]
     public DateTime CreatedOnAt { get; set; }
 
     [Required]
+    [Column(TypeName = "datetime")]
     public DateTime UpdatedOnAt { get; set; }
     
+    [Column(TypeName = "int")]
+    public int? CreatedById { get; set; }
     
-    public string? CreatedBy { get; set; }
-    public string? UpdatedBy { get; set; }
+    [Column(TypeName = "int")]
+    public int? UpdatedById { get; set; }
+    
+    // Foreign keys
+    [ForeignKey("CreatedById")]
+    public User? CreatedBy { get; set; }
+    
+    [ForeignKey("UpdatedById")]
+    public User? UpdatedBy { get; set; }
 }
