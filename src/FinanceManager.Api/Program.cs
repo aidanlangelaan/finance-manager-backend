@@ -1,6 +1,7 @@
 using FinanceManager.Api.Endpoints;
 using FinanceManager.Api.Extensions;
 using FinanceManager.Api.Middleware;
+using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using Scalar.AspNetCore;
@@ -12,7 +13,18 @@ builder.Services.RegisterInfrastructureServices(builder.Configuration);
 builder.Services.RegisterPersistenceServices(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddAuthentication();
+var authSettings = builder.Configuration.GetSection("Authentication");
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = authSettings["Authority"];
+        options.Audience = authSettings["Audience"];
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = !string.IsNullOrEmpty(authSettings["Audience"])
+        };
+    });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddOpenApi();
@@ -38,8 +50,11 @@ builder.Services.AddOpenApiDocument(config =>
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<UserIdentificationMiddleware>();
 
 // Enable OpenAPI and Scalar API reference
 app.UseOpenApi();
@@ -47,7 +62,8 @@ app.MapOpenApi();
 app.MapScalarApiReference();
 
 // Group and map endpoints
-app.MapTransactionEndpointspoints();
+app.MapTransactionEndpoints();
 app.MapAccountEndpoints();
+app.MapUserEndpoints();
 
 app.Run();

@@ -1,19 +1,13 @@
 using System.Linq.Expressions;
+using FinanceManager.Application.Interfaces;
 using FinanceManager.Domain.Entities;
-using FinanceManager.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options, IUserService userService)
+    : DbContext(options)
 {
-    private readonly ICurrentUserService _currentUserService;
-        
-    public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService) : base(options)
-    {
-        _currentUserService = currentUserService;
-    }
-    
     public DbSet<Account> Accounts;
     public DbSet<Transaction> Transactions;
     public DbSet<User> Users;
@@ -55,7 +49,7 @@ public class AppDbContext : DbContext
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var userId = _currentUserService.UserId;
+        //var userId = userService.UserId;
         var now = DateTime.UtcNow;
         
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())

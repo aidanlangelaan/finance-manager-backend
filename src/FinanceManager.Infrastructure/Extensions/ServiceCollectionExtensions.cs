@@ -1,4 +1,4 @@
-using FinanceManager.Domain.Interfaces;
+using FinanceManager.Application.Interfaces;
 using FinanceManager.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,8 +8,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
     {
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        
+        services.AddScoped<IUserService, UserService>();
+
         return services;
     }
 }

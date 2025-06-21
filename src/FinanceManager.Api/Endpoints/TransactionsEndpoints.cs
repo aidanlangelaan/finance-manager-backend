@@ -2,18 +2,19 @@ namespace FinanceManager.Api.Endpoints;
 
 public static class TransactionsEndpoints
 {
-    public static RouteGroupBuilder MapTransactionEndpoints(this RouteGroupBuilder group)
-    {
-        return group;
-    }
-    
-    public static void MapTransactionEndpointspoints(this IEndpointRouteBuilder endpointRouteBuilder)
+    public static void MapTransactionEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
     {
         var group = endpointRouteBuilder
             .MapGroup("/api/transactions")
-            .WithTags("Transactions");
+            .WithTags("Transactions")
+            .RequireAuthorization();
 
-        group.MapGet("/", GetAllTransactions);
+        group.MapGet("/", GetAllTransactions)
+            .WithName("GetAllTransactions")
+            .WithSummary("Retrieve all transactions")
+            .WithDescription("This endpoint retrieves a list of all transactions associated with the authenticated user.")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
     }
 
     private static async Task<IResult> GetAllTransactions(CancellationToken ct)

@@ -12,6 +12,10 @@ public class User : AuditableEntity
     [Required]
     [Column(TypeName = "varchar(100)")]
     public string DisplayName { get; set; }
+    
+    [Required]
+    [Column(TypeName = "varchar(100)")]
+    public string Email { get; set; }
 
     // Relationships
     public ICollection<Account> Accounts { get; set; } = new List<Account>();

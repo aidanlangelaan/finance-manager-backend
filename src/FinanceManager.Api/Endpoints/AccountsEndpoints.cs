@@ -6,7 +6,8 @@ public static class AccountsEndpoints
     {
         var group = endpointRouteBuilder
             .MapGroup("/api/accounts")
-            .WithTags("Accounts");
+            .WithTags("Accounts")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAllAccountsAsync)
             .WithName("GetAllAccounts")
