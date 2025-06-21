@@ -1,6 +1,8 @@
 using FinanceManager.Api.Endpoints;
 using FinanceManager.Api.Extensions;
 using FinanceManager.Api.Middleware;
+using FinanceManager.Api.Services;
+using FinanceManager.Application.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
@@ -8,10 +10,12 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 builder.Services.RegisterApplicationServices(builder.Configuration);
 builder.Services.RegisterInfrastructureServices(builder.Configuration);
 builder.Services.RegisterPersistenceServices(builder.Configuration);
-builder.Services.AddHttpContextAccessor();
 
 var authSettings = builder.Configuration.GetSection("Authentication");
 builder.Services.AddAuthentication("Bearer")
