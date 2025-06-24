@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: finance_manager_postgres_dev
+    environment:
+      POSTGRES_USER: financemanager
+      POSTGRES_PASSWORD: financemanager
+      POSTGRES_DB: financemanager
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data"
+
+volumes:
+  postgres_data:
