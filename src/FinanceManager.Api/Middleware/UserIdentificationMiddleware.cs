@@ -10,11 +10,11 @@ public class UserIdentificationMiddleware(RequestDelegate next)
     {
         if (context.User.Identity?.IsAuthenticated == true)
         {
-            var sub = context.User.FindFirst("sub")?.Value;
+            var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var preferredUsername = context.User.FindFirst("preferred_username")?.Value;
             var email = context.User.FindFirst(ClaimTypes.Email)?.Value;
 
-            if (string.IsNullOrWhiteSpace(sub))
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 throw new MissingClaimException("Authenticated token is missing required 'sub' claim.");
             }
@@ -29,10 +29,10 @@ public class UserIdentificationMiddleware(RequestDelegate next)
                 throw new MissingClaimException("Authenticated token is missing required 'email' claim.");
             }
             
-            if (!string.IsNullOrEmpty(sub))
+            if (!string.IsNullOrEmpty(userId))
             {
                 var localUser = await userService.GetOrCreateUserAsync(
-                    Guid.Parse(sub),
+                    Guid.Parse(userId),
                     preferredUsername,
                     email
                 );
