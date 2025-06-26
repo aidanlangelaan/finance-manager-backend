@@ -18,7 +18,7 @@ public class Transaction : AuditableEntity
     public decimal Amount { get; set; }
     
     [Required]
-    [Column(TypeName = "datetime")]
+    [Column(TypeName = "timestamp without time zone")]
     public DateTime Date { get; set; }
     
     [Column(TypeName = "varchar(255)")]

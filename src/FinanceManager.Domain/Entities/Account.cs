@@ -11,7 +11,7 @@ public class Account : AuditableEntity
     public string Name { get; set; }
     
     [Required]
-    [Column(TypeName = "tinyint")]
+    [Column(TypeName = "smallint")]
     public AccountType Type { get; set; }
     
     [Column(TypeName = "varchar(255)")]

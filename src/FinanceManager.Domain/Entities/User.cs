@@ -6,9 +6,9 @@ namespace FinanceManager.Domain.Entities;
 public class User : AuditableEntity
 {
     [Required]
-    [Column(TypeName = "varchar(36)")]
+    [Column(TypeName = "uuid")]
     public Guid KeycloakId { get; set; }
-
+    
     [Required]
     [Column(TypeName = "varchar(100)")]
     public string DisplayName { get; set; }
