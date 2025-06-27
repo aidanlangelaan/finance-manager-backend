@@ -47,7 +47,7 @@ builder.Services.AddOpenApiDocument(config =>
     config.Title = "Personal Finance Manager - API";
     config.Version = "v1";
     config.Description = "API for managing personal finances, including transactions and accounts.";
-    
+
     config.AddSecurity("Bearer", [], new OpenApiSecurityScheme
     {
         Type = OpenApiSecuritySchemeType.Http,
@@ -55,7 +55,7 @@ builder.Services.AddOpenApiDocument(config =>
         BearerFormat = "JWT",
         Description = "Input your JWT token in this format: Bearer {your token}."
     });
-    
+
     config.PostProcess = doc =>
     {
         doc.Info.Contact = new OpenApiContact
@@ -64,7 +64,7 @@ builder.Services.AddOpenApiDocument(config =>
             Email = "aidan@langelaan.pro"
         };
     };
-    
+
     config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("bearer"));
 });
 
@@ -96,3 +96,5 @@ app.MapAccountEndpoints();
 app.MapUserEndpoints();
 
 app.Run();
+
+public partial class Program { }

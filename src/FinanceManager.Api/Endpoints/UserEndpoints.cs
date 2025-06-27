@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using FinanceManager.Application.Interfaces;
 
 namespace FinanceManager.Api.Endpoints;
 
@@ -19,22 +20,16 @@ public static class UserEndpoints
             .Produces(StatusCodes.Status400BadRequest);
     }
     
-    private static IResult GetMeAsync(HttpContext httpContext, CancellationToken ct)
+    private static IResult GetMeAsync(ICurrentUserService currentUser, CancellationToken ct)
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var name = httpContext.User.FindFirst("name")?.Value;
-        var email = httpContext.User.FindFirst(ClaimTypes.Email)?.Value;
-
-        if (string.IsNullOrEmpty(userId))
-        {
+        if (!currentUser.IsAuthenticated || currentUser.KeycloakId is null)
             return Results.Unauthorized();
-        }
 
         return Results.Ok(new
         {
-            UserId = userId,
-            Name = name,
-            Email = email
+            UserId = currentUser.KeycloakId,
+            Name = currentUser.DisplayName,
+            Email = currentUser.Email
         });
     }
 }
