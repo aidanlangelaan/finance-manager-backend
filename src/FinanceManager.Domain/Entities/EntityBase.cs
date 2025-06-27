@@ -8,7 +8,8 @@ public abstract class EntityBase
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-
+    
     [ConcurrencyCheck]
-    public DateTime RowVersion { get; set; }
+    [Column("xmin")]
+    public uint RowVersion { get; set; }
 }

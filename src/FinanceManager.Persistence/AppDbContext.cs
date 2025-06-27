@@ -1,5 +1,6 @@
 using FinanceManager.Application.Interfaces;
 using FinanceManager.Domain.Entities;
+using FinanceManager.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.Persistence;
@@ -20,12 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserSe
         // Apply all Entity Type Configurations
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-        // Apply audit-specific config per entity
-        ConfigureAuditableEntity<Account>(modelBuilder);
-        ConfigureAuditableEntity<Transaction>(modelBuilder);
-        ConfigureAuditableEntity<Category>(modelBuilder);
-        ConfigureAuditableEntity<Tag>(modelBuilder);
-        ConfigureAuditableEntity<User>(modelBuilder);
+        modelBuilder.ConfigureCommonBaseEntities();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -51,23 +47,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserSe
         }
 
         return await base.SaveChangesAsync(cancellationToken);
-    }
-
-    private static void ConfigureAuditableEntity<TEntity>(ModelBuilder modelBuilder)
-        where TEntity : AuditableEntity
-    {
-        modelBuilder.Entity<TEntity>()
-            .HasOne(e => e.CreatedBy)
-            .WithMany()
-            .HasForeignKey(e => e.CreatedById)
-            .HasPrincipalKey(u => u.KeycloakId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<TEntity>()
-            .HasOne(e => e.UpdatedBy)
-            .WithMany()
-            .HasForeignKey(e => e.UpdatedById)
-            .HasPrincipalKey(u => u.KeycloakId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

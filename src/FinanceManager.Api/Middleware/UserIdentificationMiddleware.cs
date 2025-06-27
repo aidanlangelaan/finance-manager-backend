@@ -11,17 +11,12 @@ public class UserIdentificationMiddleware(RequestDelegate next)
         if (context.User.Identity?.IsAuthenticated == true)
         {
             var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var preferredUsername = context.User.FindFirst("preferred_username")?.Value;
             var email = context.User.FindFirst(ClaimTypes.Email)?.Value;
+            var name = context.User.FindFirst("name")?.Value ?? email;
 
             if (string.IsNullOrWhiteSpace(userId))
             {
                 throw new MissingClaimException("Authenticated token is missing required 'sub' claim.");
-            }
-
-            if (string.IsNullOrWhiteSpace(preferredUsername))
-            {
-                throw new MissingClaimException("Authenticated token is missing required 'preferred_username' claim.");
             }
 
             if (string.IsNullOrWhiteSpace(email))
@@ -33,12 +28,12 @@ public class UserIdentificationMiddleware(RequestDelegate next)
             {
                 var localUser = await userService.GetOrCreateUserAsync(
                     Guid.Parse(userId),
-                    preferredUsername,
+                    name,
                     email
                 );
 
                 context.Items["LocalUser"] = localUser;
-                context.Items["PreferredUsername"] = preferredUsername;
+                context.Items["Name"] = name;
                 context.Items["Email"] = email;
             }
         }
