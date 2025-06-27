@@ -19,21 +19,21 @@ public static class UserEndpoints
             .Produces(StatusCodes.Status400BadRequest);
     }
     
-    private static async Task<IResult> GetMeAsync(HttpContext httpContext, CancellationToken ct)
+    private static IResult GetMeAsync(HttpContext httpContext, CancellationToken ct)
     {
-        var sub = httpContext.User.FindFirst("sub")?.Value;
-        var username = httpContext.User.FindFirst("preferred_username")?.Value;
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var name = httpContext.User.FindFirst("name")?.Value;
         var email = httpContext.User.FindFirst(ClaimTypes.Email)?.Value;
 
-        if (string.IsNullOrEmpty(sub))
+        if (string.IsNullOrEmpty(userId))
         {
             return Results.Unauthorized();
         }
 
         return Results.Ok(new
         {
-            Sub = sub,
-            PreferredUsername = username,
+            UserId = userId,
+            Name = name,
             Email = email
         });
     }

@@ -85,7 +85,8 @@ app.MapScalarApiReference((options, context) =>
     options.Title = "Personal Finance Manager - API";
     options.Theme = ScalarTheme.Laserwave;
     options.DefaultHttpClient = new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.Node, ScalarClient.Axios);
-    options.WithDownloadButton();
+    options.WithDocumentDownloadType(DocumentDownloadType.Json);
+    options.WithClientButton(false);
     options.AddPreferredSecuritySchemes("BearerAuth");
 });
 

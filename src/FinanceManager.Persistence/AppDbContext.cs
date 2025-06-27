@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.Persistence;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService)
+public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService, TimeProvider timeProvider)
     : DbContext(options)
 {
     public DbSet<Account> Accounts { get; set; }
@@ -27,7 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserSe
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var userId = currentUserService.KeycloakId;
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
