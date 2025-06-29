@@ -88,6 +88,7 @@ app.MapScalarApiReference((options, context) =>
     options.WithDocumentDownloadType(DocumentDownloadType.Json);
     options.WithClientButton(false);
     options.AddPreferredSecuritySchemes("BearerAuth");
+    options.WithPersistentAuthentication();
 });
 
 // Group and map endpoints
