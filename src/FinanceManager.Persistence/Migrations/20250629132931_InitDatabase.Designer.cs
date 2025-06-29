@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FinanceManager.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250627081928_InitDatabase")]
+    [Migration("20250629132931_InitDatabase")]
     partial class InitDatabase
     {
         /// <inheritdoc />
@@ -39,8 +39,8 @@ namespace FinanceManager.Persistence.Migrations
                     b.Property<bool>("CanTransferTo")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOnAt")
                         .HasColumnType("timestamp with time zone");
@@ -67,22 +67,17 @@ namespace FinanceManager.Persistence.Migrations
                     b.Property<byte>("Type")
                         .HasColumnType("smallint");
 
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("UpdatedById");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Accounts");
                 });
@@ -95,8 +90,8 @@ namespace FinanceManager.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOnAt")
                         .HasColumnType("timestamp with time zone");
@@ -114,14 +109,11 @@ namespace FinanceManager.Persistence.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -130,8 +122,6 @@ namespace FinanceManager.Persistence.Migrations
                     b.HasIndex("ParentCategoryId");
 
                     b.HasIndex("UpdatedById");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
                 });
@@ -144,8 +134,8 @@ namespace FinanceManager.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOnAt")
                         .HasColumnType("timestamp with time zone");
@@ -160,22 +150,17 @@ namespace FinanceManager.Persistence.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("UpdatedById");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Tags");
                 });
@@ -194,8 +179,8 @@ namespace FinanceManager.Persistence.Migrations
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOnAt")
                         .HasColumnType("timestamp with time zone");
@@ -218,14 +203,11 @@ namespace FinanceManager.Persistence.Migrations
                     b.Property<int>("SourceAccountId")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -239,8 +221,6 @@ namespace FinanceManager.Persistence.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Transactions");
                 });
 
@@ -252,8 +232,8 @@ namespace FinanceManager.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOnAt")
                         .HasColumnType("timestamp with time zone");
@@ -275,8 +255,8 @@ namespace FinanceManager.Persistence.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedOnAt")
                         .HasColumnType("timestamp with time zone");
@@ -308,20 +288,14 @@ namespace FinanceManager.Persistence.Migrations
             modelBuilder.Entity("FinanceManager.Domain.Entities.Account", b =>
                 {
                     b.HasOne("FinanceManager.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("Accounts")
                         .HasForeignKey("CreatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("FinanceManager.Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("FinanceManager.Domain.Entities.User", null)
-                        .WithMany("Accounts")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("CreatedBy");
 
@@ -331,9 +305,8 @@ namespace FinanceManager.Persistence.Migrations
             modelBuilder.Entity("FinanceManager.Domain.Entities.Category", b =>
                 {
                     b.HasOne("FinanceManager.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("Categories")
                         .HasForeignKey("CreatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("FinanceManager.Domain.Entities.Category", "ParentCategory")
@@ -344,12 +317,7 @@ namespace FinanceManager.Persistence.Migrations
                     b.HasOne("FinanceManager.Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("FinanceManager.Domain.Entities.User", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("CreatedBy");
 
@@ -361,20 +329,14 @@ namespace FinanceManager.Persistence.Migrations
             modelBuilder.Entity("FinanceManager.Domain.Entities.Tag", b =>
                 {
                     b.HasOne("FinanceManager.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("Tags")
                         .HasForeignKey("CreatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("FinanceManager.Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("FinanceManager.Domain.Entities.User", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("CreatedBy");
 
@@ -388,9 +350,8 @@ namespace FinanceManager.Persistence.Migrations
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("FinanceManager.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("CreatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("FinanceManager.Domain.Entities.Account", "DestinationAccount")
@@ -408,12 +369,7 @@ namespace FinanceManager.Persistence.Migrations
                     b.HasOne("FinanceManager.Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("FinanceManager.Domain.Entities.User", null)
-                        .WithMany("Transactions")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Category");
 
@@ -431,13 +387,11 @@ namespace FinanceManager.Persistence.Migrations
                     b.HasOne("FinanceManager.Domain.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("FinanceManager.Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
-                        .HasPrincipalKey("KeycloakId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");

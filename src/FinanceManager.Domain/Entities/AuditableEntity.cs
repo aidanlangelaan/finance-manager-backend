@@ -13,11 +13,11 @@ public class AuditableEntity : EntityBase
     [Column(TypeName = "timestamp with time zone")]
     public DateTime UpdatedOnAt { get; set; }
 
-    [Column(TypeName = "uuid")]
-    public Guid? CreatedById { get; set; }
+    [Column(TypeName = "int")]
+    public int? CreatedById { get; set; }
 
-    [Column(TypeName = "uuid")]
-    public Guid? UpdatedById { get; set; }
+    [Column(TypeName = "int")]
+    public int? UpdatedById { get; set; }
 
     // Foreign keys
     public User? CreatedBy { get; set; }

@@ -9,10 +9,10 @@ namespace FinanceManager.Persistence.Repositories;
 
 public class AccountRepository(AppDbContext context) : IAccountRepository
 {
-    public async Task<AccountResponseDto?> GetByIdAsync(int id, Guid? keycloakId, CancellationToken ct)
+    public async Task<AccountResponseDto?> GetByIdAsync(int id, int? userId, CancellationToken ct)
     {
         return await context.Accounts
-            .Where(a => a.Id == id && a.CreatedById == keycloakId)
+            .Where(a => a.Id == id && a.CreatedById == userId)
             .Select(a => new AccountResponseDto
             {
                 Id = a.Id,
@@ -27,11 +27,11 @@ public class AccountRepository(AppDbContext context) : IAccountRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<PagedResult<AccountResponseDto>> GetAllAsync(Guid? keycloakId, PagedRequest paging,
+    public async Task<PagedResult<AccountResponseDto>> GetAllAsync(int? userId, PagedRequest paging,
         CancellationToken ct)
     {
         var query = context.Accounts
-            .Where(a => a.CreatedById == keycloakId)
+            .Where(a => a.CreatedById == userId)
             .OrderBy(a => a.Name)
             .Select(a => new AccountResponseDto
             {
@@ -66,7 +66,7 @@ public class AccountRepository(AppDbContext context) : IAccountRepository
         return Task.CompletedTask;
     }
 
-    public async Task<Account?> FindEntityByIdAsync(int id, Guid? keycloakId, CancellationToken ct) =>
+    public async Task<Account?> FindEntityByIdAsync(int id, int? userId, CancellationToken ct) =>
         await context.Accounts
-            .FirstOrDefaultAsync(a => a.Id == id && a.CreatedById == keycloakId, ct);
+            .FirstOrDefaultAsync(a => a.Id == id && a.CreatedById == userId, ct);
 }

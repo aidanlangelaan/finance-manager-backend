@@ -13,8 +13,8 @@ public static class ModelBuilderExtensions
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             var clrType = entityType.ClrType;
-            
-            // Configure entity-base properties 
+
+            // Configure entity-base properties
             if (baseType.IsAssignableFrom(clrType))
             {
                 modelBuilder.Entity(clrType)
@@ -30,16 +30,41 @@ public static class ModelBuilderExtensions
                     .HasOne(typeof(User), "CreatedBy")
                     .WithMany()
                     .HasForeignKey("CreatedById")
-                    .HasPrincipalKey(nameof(User.KeycloakId))
                     .OnDelete(DeleteBehavior.Restrict);
 
                 modelBuilder.Entity(clrType)
                     .HasOne(typeof(User), "UpdatedBy")
                     .WithMany()
                     .HasForeignKey("UpdatedById")
-                    .HasPrincipalKey(nameof(User.KeycloakId))
                     .OnDelete(DeleteBehavior.Restrict);
             }
         }
+    }
+
+    public static void ConfigureUserRelationships(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Accounts)
+            .WithOne(a => a.CreatedBy)
+            .HasForeignKey(a => a.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Transactions)
+            .WithOne(t => t.CreatedBy)
+            .HasForeignKey(t => t.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Categories)
+            .WithOne(c => c.CreatedBy)
+            .HasForeignKey(c => c.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Tags)
+            .WithOne(t => t.CreatedBy)
+            .HasForeignKey(t => t.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

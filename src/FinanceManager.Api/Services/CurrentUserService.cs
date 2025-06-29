@@ -6,13 +6,8 @@ namespace FinanceManager.Api.Services;
 public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {
     public Guid? KeycloakId
-    {
-        get
-        {
-            var sub = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Guid.TryParse(sub, out var guid) ? guid : null;
-        }
-    }
+        => Guid.TryParse(httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var id)
+            ? id : null;
 
     public string? DisplayName
         => httpContextAccessor.HttpContext?.User.FindFirst("preferred_username")?.Value;
@@ -22,4 +17,9 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 
     public bool IsAuthenticated
         => httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
+
+    public int? UserId
+        => httpContextAccessor.HttpContext?.Items.TryGetValue("UserId", out var value) == true && value is int id
+            ? id
+            : null;
 }

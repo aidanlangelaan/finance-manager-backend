@@ -18,15 +18,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserSe
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply all Entity Type Configurations
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         modelBuilder.ConfigureCommonBaseEntities();
+
+        modelBuilder.ConfigureUserRelationships();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var userId = currentUserService.KeycloakId;
+        var userId = currentUserService.UserId;
         var now = timeProvider.GetUtcNow().UtcDateTime;
 
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())

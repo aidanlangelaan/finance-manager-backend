@@ -24,24 +24,23 @@ namespace FinanceManager.Persistence.Migrations
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     CreatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uuid", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uuid", nullable: true)
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.UniqueConstraint("AK_Users_KeycloakId", x => x.KeycloakId);
                     table.ForeignKey(
                         name: "FK_Users_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Users_Users_UpdatedById",
                         column: x => x.UpdatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -58,12 +57,11 @@ namespace FinanceManager.Persistence.Migrations
                     IncludedInNetWorth = table.Column<bool>(type: "boolean", nullable: false),
                     CanTransferFrom = table.Column<bool>(type: "boolean", nullable: false),
                     CanTransferTo = table.Column<bool>(type: "boolean", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     CreatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uuid", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uuid", nullable: true)
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -72,19 +70,14 @@ namespace FinanceManager.Persistence.Migrations
                         name: "FK_Accounts_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Accounts_Users_UpdatedById",
                         column: x => x.UpdatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Accounts_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -95,12 +88,11 @@ namespace FinanceManager.Persistence.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "varchar(100)", nullable: false),
                     ParentCategoryId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     CreatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uuid", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uuid", nullable: true)
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -115,19 +107,14 @@ namespace FinanceManager.Persistence.Migrations
                         name: "FK_Categories_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Categories_Users_UpdatedById",
                         column: x => x.UpdatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Categories_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -137,12 +124,11 @@ namespace FinanceManager.Persistence.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "varchar(100)", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     CreatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uuid", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uuid", nullable: true)
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -151,19 +137,14 @@ namespace FinanceManager.Persistence.Migrations
                         name: "FK_Tags_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Tags_Users_UpdatedById",
                         column: x => x.UpdatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Tags_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -178,12 +159,11 @@ namespace FinanceManager.Persistence.Migrations
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Description = table.Column<string>(type: "varchar(255)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     CreatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOnAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uuid", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uuid", nullable: true)
+                    CreatedById = table.Column<int>(type: "int", nullable: true),
+                    UpdatedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -209,19 +189,14 @@ namespace FinanceManager.Persistence.Migrations
                         name: "FK_Transactions_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Transactions_Users_UpdatedById",
                         column: x => x.UpdatedById,
                         principalTable: "Users",
-                        principalColumn: "KeycloakId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Transactions_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -259,11 +234,6 @@ namespace FinanceManager.Persistence.Migrations
                 column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_UserId",
-                table: "Accounts",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Categories_CreatedById",
                 table: "Categories",
                 column: "CreatedById");
@@ -279,11 +249,6 @@ namespace FinanceManager.Persistence.Migrations
                 column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_UserId",
-                table: "Categories",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Tags_CreatedById",
                 table: "Tags",
                 column: "CreatedById");
@@ -292,11 +257,6 @@ namespace FinanceManager.Persistence.Migrations
                 name: "IX_Tags_UpdatedById",
                 table: "Tags",
                 column: "UpdatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tags_UserId",
-                table: "Tags",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_CategoryId",
@@ -322,11 +282,6 @@ namespace FinanceManager.Persistence.Migrations
                 name: "IX_Transactions_UpdatedById",
                 table: "Transactions",
                 column: "UpdatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Transactions_UserId",
-                table: "Transactions",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionTags_TransactionsId",

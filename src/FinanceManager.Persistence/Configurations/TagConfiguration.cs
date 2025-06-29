@@ -8,6 +8,9 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
 {
     public void Configure(EntityTypeBuilder<Tag> builder)
     {
-        // Add any future tag-specific configuration here
+        builder.HasOne(t => t.CreatedBy)
+            .WithMany(u => u.Tags)
+            .HasForeignKey(t => t.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

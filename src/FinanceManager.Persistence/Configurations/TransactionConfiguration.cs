@@ -11,5 +11,10 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.HasMany(t => t.Tags)
                .WithMany(t => t.Transactions)
                .UsingEntity(j => j.ToTable("TransactionTags"));
+
+        builder.HasOne(t => t.CreatedBy)
+            .WithMany(u => u.Transactions)
+            .HasForeignKey(t => t.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
