@@ -1,5 +1,6 @@
 ﻿using FinanceManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FinanceManager.Persistence.Extensions;
 
@@ -18,26 +19,56 @@ public static class ModelBuilderExtensions
             if (baseType.IsAssignableFrom(clrType))
             {
                 modelBuilder.Entity(clrType)
+                    .Property("Id")
+                    .ValueGeneratedOnAdd();
+
+                modelBuilder.Entity(clrType)
+                    .Property("Id")
+                    .ValueGeneratedOnAdd();
+
+                var rowVersionProperty = modelBuilder.Entity(clrType)
                     .Property("RowVersion")
-                    .IsRowVersion()
-                    .HasColumnType("xid");
+                    .IsConcurrencyToken()
+                    .HasColumnName("xmin")
+                    .HasColumnType("xid")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                rowVersionProperty.Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
+                rowVersionProperty.Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
             }
+
+            if (!auditableType.IsAssignableFrom(clrType)) continue;
 
             // Configure auditable-entity properties
-            if (auditableType.IsAssignableFrom(clrType))
-            {
-                modelBuilder.Entity(clrType)
-                    .HasOne(typeof(User), "CreatedBy")
-                    .WithMany()
-                    .HasForeignKey("CreatedById")
-                    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity(clrType)
+                .Property("CreatedById")
+                .HasColumnType("int");
 
-                modelBuilder.Entity(clrType)
-                    .HasOne(typeof(User), "UpdatedBy")
-                    .WithMany()
-                    .HasForeignKey("UpdatedById")
-                    .OnDelete(DeleteBehavior.Restrict);
-            }
+            modelBuilder.Entity(clrType)
+                .Property("UpdatedById")
+                .HasColumnType("int");
+
+            modelBuilder.Entity(clrType)
+                .Property("CreatedOnAt")
+                .IsRequired()
+                .HasColumnType("timestamp with time zone");
+
+            modelBuilder.Entity(clrType)
+                .Property("UpdatedOnAt")
+                .IsRequired()
+                .HasColumnType("timestamp with time zone");
+
+            modelBuilder.Entity(clrType)
+                .HasOne(typeof(User), "CreatedBy")
+                .WithMany()
+                .HasForeignKey("CreatedById")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity(clrType)
+                .HasOne(typeof(User), "UpdatedBy")
+                .WithMany()
+                .HasForeignKey("UpdatedById")
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 
@@ -63,6 +94,12 @@ public static class ModelBuilderExtensions
 
         modelBuilder.Entity<User>()
             .HasMany(u => u.Tags)
+            .WithOne(t => t.CreatedBy)
+            .HasForeignKey(t => t.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Users)
             .WithOne(t => t.CreatedBy)
             .HasForeignKey(t => t.CreatedById)
             .OnDelete(DeleteBehavior.Restrict);

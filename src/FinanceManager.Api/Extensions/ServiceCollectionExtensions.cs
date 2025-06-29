@@ -1,24 +1,17 @@
-using FinanceManager.Application;
-using FinanceManager.Application.Extensions;
-using FinanceManager.Infrastructure.Identity.Services;
-using FinanceManager.Persistence.Extensions;
+using FinanceManager.Api.Common.Validators;
+using FinanceManager.Api.ViewModels.Account.Mapping;
+using FluentValidation;
 
 namespace FinanceManager.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterApplicationServices(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection RegisterApiServices(this IServiceCollection services)
     {
-        return services.AddApplicationServices();
-    }
+        services.AddHttpContextAccessor();
+        services.AddValidatorsFromAssemblyContaining<PagedRequestValidator>();
+        services.AddSingleton<AccountViewModelMapper>();
 
-    public static IServiceCollection RegisterInfrastructureServices(this IServiceCollection services, IConfiguration config)
-    {
-        return services.AddInfrastructureServices();
-    }
-
-    public static IServiceCollection RegisterPersistenceServices(this IServiceCollection services, IConfiguration config)
-    {
-        return services.AddPersistenceServices(config);
+        return services;
     }
 }

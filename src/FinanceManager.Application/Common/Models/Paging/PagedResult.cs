@@ -7,5 +7,6 @@ public class PagedResult<T>
     public int PageNumber { get; init; }
     public int PageSize { get; init; }
 
+    // ReSharper disable once UnusedMember.Global
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
 }

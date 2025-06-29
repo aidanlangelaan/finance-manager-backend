@@ -30,6 +30,7 @@ public partial class AccountMapper
     [MapperIgnoreSource(nameof(Account.DestinationTransactions))]
     public partial AccountResponseDto ToDto(Account entity);
 
+    [MapperIgnoreTarget(nameof(Account.Id))]
     [MapperIgnoreTarget(nameof(Account.CurrentBalance))]
     [MapperIgnoreTarget(nameof(Account.RowVersion))]
     [MapperIgnoreTarget(nameof(Account.CreatedOnAt))]

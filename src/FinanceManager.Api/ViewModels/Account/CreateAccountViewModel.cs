@@ -1,14 +1,16 @@
 ﻿using FinanceManager.Domain.Enums;
 
-namespace FinanceManager.Application.Accounts.Dtos;
+namespace FinanceManager.Api.ViewModels.Account;
 
-public class UpdateAccountDto
+public class CreateAccountViewModel
 {
     public required string Name { get; set; }
 
     public string? Description { get; set; }
 
     public AccountType Type { get; set; }
+
+    public decimal CurrentBalance { get; set; }
 
     public bool IncludedInNetWorth { get; set; }
 

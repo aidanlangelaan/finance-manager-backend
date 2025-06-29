@@ -4,6 +4,7 @@
     <ProjectReference Include="..\FinanceManager.Domain\FinanceManager.Domain.csproj" />
     <ProjectReference Include="..\FinanceManager.Application\FinanceManager.Application.csproj" />
     <ProjectReference Include="..\FinanceManager.Persistence\FinanceManager.Persistence.csproj" />
+    
   </ItemGroup>
 
   <ItemGroup>

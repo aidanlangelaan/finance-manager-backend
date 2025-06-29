@@ -9,7 +9,7 @@ namespace FinanceManager.Persistence.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
+    public static void RegisterPersistenceServices(this IServiceCollection services, IConfiguration _)
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -19,7 +19,5 @@ public static class ServiceCollectionExtensions
             var config = sp.GetRequiredService<IConfiguration>();
             options.UseNpgsql(config.GetConnectionString("AppDbContext"));
         });
-
-        return services;
     }
 }

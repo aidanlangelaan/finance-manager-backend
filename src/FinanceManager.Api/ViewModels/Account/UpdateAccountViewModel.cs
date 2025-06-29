@@ -1,8 +1,8 @@
 ﻿using FinanceManager.Domain.Enums;
 
-namespace FinanceManager.Application.Accounts.Dtos;
+namespace FinanceManager.Api.ViewModels.Account;
 
-public class UpdateAccountDto
+public class UpdateAccountViewModel
 {
     public required string Name { get; set; }
 

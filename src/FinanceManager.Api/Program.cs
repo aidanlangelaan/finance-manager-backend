@@ -2,8 +2,9 @@ using FinanceManager.Api.Endpoints;
 using FinanceManager.Api.Extensions;
 using FinanceManager.Api.Middleware;
 using FinanceManager.Api.OpenApi;
-using FinanceManager.Api.Services;
-using FinanceManager.Application.Common.Interfaces;
+using FinanceManager.Application.Extensions;
+using FinanceManager.Infrastructure.Extensions;
+using FinanceManager.Persistence.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
@@ -14,12 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-
-builder.Services.RegisterApplicationServices(builder.Configuration);
-builder.Services.RegisterInfrastructureServices(builder.Configuration);
-builder.Services.RegisterPersistenceServices(builder.Configuration);
+builder.Services
+    .RegisterApiServices()
+    .RegisterApplicationServices(builder.Configuration)
+    .RegisterInfrastructureServices(builder.Configuration)
+    .RegisterPersistenceServices(builder.Configuration);
 
 var authSettings = builder.Configuration.GetSection("Authentication");
 builder.Services.AddAuthentication("Bearer")
@@ -98,3 +98,4 @@ app.MapUserEndpoints();
 app.Run();
 
 public partial class Program { }
+

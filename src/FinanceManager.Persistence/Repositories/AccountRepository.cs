@@ -1,51 +1,23 @@
-﻿using FinanceManager.Application.Accounts.Dtos;
 using FinanceManager.Application.Common.Interfaces.Persistence;
-using FinanceManager.Application.Common.Models.Paging;
 using FinanceManager.Domain.Entities;
-using FinanceManager.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.Persistence.Repositories;
 
 public class AccountRepository(AppDbContext context) : IAccountRepository
 {
-    public async Task<AccountResponseDto?> GetByIdAsync(int id, int? userId, CancellationToken ct)
+    public async Task<Account?> GetByIdAsync(int id, int? userId, CancellationToken ct)
     {
         return await context.Accounts
             .Where(a => a.Id == id && a.CreatedById == userId)
-            .Select(a => new AccountResponseDto
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Description = a.Description,
-                Type = a.Type,
-                CurrentBalance = a.CurrentBalance,
-                IncludedInNetWorth = a.IncludedInNetWorth,
-                CanTransferFrom = a.CanTransferFrom,
-                CanTransferTo = a.CanTransferTo
-            })
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<PagedResult<AccountResponseDto>> GetAllAsync(int? userId, PagedRequest paging,
-        CancellationToken ct)
+    public IQueryable<Account> GetAllAsync(int? userId)
     {
-        var query = context.Accounts
+        return context.Accounts
             .Where(a => a.CreatedById == userId)
-            .OrderBy(a => a.Name)
-            .Select(a => new AccountResponseDto
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Description = a.Description,
-                Type = a.Type,
-                CurrentBalance = a.CurrentBalance,
-                IncludedInNetWorth = a.IncludedInNetWorth,
-                CanTransferFrom = a.CanTransferFrom,
-                CanTransferTo = a.CanTransferTo
-            });
-
-        return await query.ToPagedResultAsync(paging, ct);
+            .OrderBy(a => a.Name);
     }
 
     public Task AddAsync(Account account, CancellationToken ct)

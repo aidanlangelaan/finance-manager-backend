@@ -1,13 +1,14 @@
-﻿using FinanceManager.Application.Common.Models.Paging;
+using FinanceManager.Application.Common.Models.Paging;
 using Microsoft.EntityFrameworkCore;
 
-namespace FinanceManager.Persistence.Extensions;
+namespace FinanceManager.Application.Extensions;
 
 public static class QueryableExtensions
 {
-    public static async Task<PagedResult<T>> ToPagedResultAsync<T>(
-        this IQueryable<T> query,
+    public static async Task<PagedResult<TDestination>> ToPagedResultAsync<TSource, TDestination>(
+        this IQueryable<TSource> query,
         PagedRequest paging,
+        Func<TSource, TDestination>? converter = null,
         CancellationToken ct = default)
     {
         var count = await query.CountAsync(ct);
@@ -16,9 +17,11 @@ public static class QueryableExtensions
             .Take(paging.ResolvedPageSize)
             .ToListAsync(ct);
 
-        return new PagedResult<T>
+        var convertedItems = converter == null ? (List<TDestination>)(object)items : items.Select(converter).ToList();
+
+        return new PagedResult<TDestination>
         {
-            Items = items,
+            Items = convertedItems,
             TotalCount = count,
             PageNumber = paging.ResolvedPageNumber,
             PageSize = paging.ResolvedPageSize

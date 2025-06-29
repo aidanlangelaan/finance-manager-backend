@@ -1,7 +1,8 @@
 using System.Security.Claims;
 using FinanceManager.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Http;
 
-namespace FinanceManager.Api.Services;
+namespace FinanceManager.Infrastructure.Services;
 
 public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {

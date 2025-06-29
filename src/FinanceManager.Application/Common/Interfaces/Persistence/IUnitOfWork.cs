@@ -1,6 +1,8 @@
-﻿namespace FinanceManager.Application.Common.Interfaces.Persistence;
+namespace FinanceManager.Application.Common.Interfaces.Persistence;
 
 public interface IUnitOfWork
 {
-    Task<int> SaveChangesAsync(CancellationToken ct = default);
+    IAccountRepository Accounts { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

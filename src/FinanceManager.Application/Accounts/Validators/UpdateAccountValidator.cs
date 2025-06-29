@@ -3,11 +3,11 @@ using FluentValidation;
 
 namespace FinanceManager.Application.Accounts.Validators;
 
+// ReSharper disable once UnusedType.Global
 public class UpdateAccountValidator : AbstractValidator<UpdateAccountDto>
 {
     public UpdateAccountValidator()
     {
-        RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
     }
 }

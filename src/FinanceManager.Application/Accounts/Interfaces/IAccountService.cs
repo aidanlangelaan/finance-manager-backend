@@ -11,7 +11,7 @@ public interface IAccountService
 
     Task<int> CreateAsync(CreateAccountDto dto, CancellationToken ct);
 
-    Task<bool> UpdateAsync(UpdateAccountDto dto, CancellationToken ct);
+    Task<bool> UpdateAsync(int id, UpdateAccountDto dto, CancellationToken ct);
 
     Task<bool> DeleteAsync(int id, CancellationToken ct);
 }

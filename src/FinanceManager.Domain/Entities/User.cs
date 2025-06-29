@@ -1,20 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace FinanceManager.Domain.Entities;
 
 public class User : AuditableEntity
 {
-    [Required]
-    [Column(TypeName = "uuid")]
     public required Guid KeycloakId { get; set; }
 
-    [Required]
-    [Column(TypeName = "varchar(100)")]
     public required string DisplayName { get; set; }
 
-    [Required]
-    [Column(TypeName = "varchar(100)")]
     public required string Email { get; set; }
 
     // Relationships
@@ -22,4 +13,6 @@ public class User : AuditableEntity
     public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     public ICollection<Category> Categories { get; set; } = new List<Category>();
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+    public ICollection<User> Users { get; set; } = new List<User>();
 }

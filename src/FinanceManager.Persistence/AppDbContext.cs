@@ -5,7 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.Persistence;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService, TimeProvider timeProvider)
+public class AppDbContext(
+    DbContextOptions<AppDbContext> options,
+    ICurrentUserService currentUserService,
+    TimeProvider timeProvider)
     : DbContext(options)
 {
     public DbSet<Account> Accounts { get; set; }
@@ -27,23 +30,22 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserSe
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var userId = currentUserService.UserId;
         var now = timeProvider.GetUtcNow().UtcDateTime;
 
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.CreatedOnAt = now;
-                entry.Entity.UpdatedOnAt = now;
-
-                entry.Entity.CreatedById = userId;
-                entry.Entity.UpdatedById = userId;
+                entry.Property("CreatedOnAt").CurrentValue = now;
+                entry.Property("UpdatedOnAt").CurrentValue = now;
+                entry.Property("CreatedById").CurrentValue = currentUserService.UserId;
+                entry.Property("UpdatedById").CurrentValue = currentUserService.UserId;
             }
-            else if (entry.State == EntityState.Modified)
+
+            if (entry.State == EntityState.Modified)
             {
-                entry.Entity.UpdatedOnAt = now;
-                entry.Entity.UpdatedById = userId;
+                entry.Property("UpdatedOnAt").CurrentValue = now;
+                entry.Property("UpdatedById").CurrentValue = currentUserService.UserId;
             }
         }
 

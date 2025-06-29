@@ -76,7 +76,7 @@ namespace FinanceManager.Persistence.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("FinanceManager.Domain.Entities.Category", b =>
@@ -120,7 +120,7 @@ namespace FinanceManager.Persistence.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("FinanceManager.Domain.Entities.Tag", b =>
@@ -159,7 +159,7 @@ namespace FinanceManager.Persistence.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("FinanceManager.Domain.Entities.Transaction", b =>
@@ -218,7 +218,7 @@ namespace FinanceManager.Persistence.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("FinanceManager.Domain.Entities.User", b =>
@@ -264,7 +264,7 @@ namespace FinanceManager.Persistence.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("TagTransaction", b =>

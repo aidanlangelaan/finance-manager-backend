@@ -3,6 +3,8 @@ using FinanceManager.Application.Accounts.Interfaces;
 using FinanceManager.Application.Common.Models.Paging;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using FinanceManager.Api.ViewModels.Account;
+using FinanceManager.Api.ViewModels.Account.Mapping;
 
 namespace FinanceManager.Api.Endpoints;
 
@@ -19,13 +21,13 @@ public static class AccountsEndpoints
             .WithName("GetAllAccounts")
             .WithSummary("Get paged accounts")
             .WithDescription("Returns a paginated list of all accounts owned by the authenticated user.")
-            .Produces<PagedResult<AccountResponseDto>>(StatusCodes.Status200OK, "application/json");
+            .Produces<PagedResult<AccountViewModel>>(StatusCodes.Status200OK, "application/json");
 
         group.MapGet("/{id:int}", GetAccountByIdAsync)
             .WithName("GetAccountById")
             .WithSummary("Get account by ID")
             .WithDescription("Returns the details of a specific account by its ID if it belongs to the authenticated user.")
-            .Produces<AccountResponseDto>(StatusCodes.Status200OK, "application/json")
+            .Produces<AccountViewModel>(StatusCodes.Status200OK, "application/json")
             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPost("/", CreateAccountAsync)
@@ -56,19 +58,27 @@ public static class AccountsEndpoints
     private static async Task<IResult> GetAllAccountsAsync(
         [AsParameters] PagedRequest paging,
         IAccountService service,
+        AccountViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetAllAsync(paging, ct);
-        return Results.Ok(result);
+        return Results.Ok(new PagedResult<AccountViewModel>
+        {
+            Items = result.Items.Select(mapper.ToViewModel).ToList(),
+            TotalCount = result.TotalCount,
+            PageNumber = result.PageNumber,
+            PageSize = result.PageSize
+        });
     }
 
     private static async Task<IResult> GetAccountByIdAsync(
         int id,
         IAccountService service,
+        AccountViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetByIdAsync(id, ct);
-        return result is null ? Results.NotFound() : Results.Ok(result);
+        return result is null ? Results.NotFound() : Results.Ok(mapper.ToViewModel(result));
     }
 
     private static async Task<IResult> CreateAccountAsync(
@@ -92,14 +102,11 @@ public static class AccountsEndpoints
         IAccountService service,
         CancellationToken ct)
     {
-        if (id != dto.Id)
-            return Results.BadRequest(new { error = "The ID in the URL does not match the ID in the payload." });
-
         var validation = await validator.ValidateAsync(dto, ct);
         if (!validation.IsValid)
             return Results.ValidationProblem(validation.ToDictionary());
 
-        var success = await service.UpdateAsync(dto, ct);
+        var success = await service.UpdateAsync(id, dto, ct);
         return success ? Results.NoContent() : Results.NotFound();
     }
 
@@ -112,3 +119,4 @@ public static class AccountsEndpoints
         return success ? Results.NoContent() : Results.NotFound();
     }
 }
+

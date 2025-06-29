@@ -17,7 +17,7 @@ public static class TransactionsEndpoints
             .Produces(StatusCodes.Status400BadRequest);
     }
 
-    private static async Task<IResult> GetAllTransactions(CancellationToken ct)
+    private static IResult GetAllTransactions(CancellationToken ct)
     {
         // Simulate fetching transactions from a database or service
         var transactions = new[]

@@ -3,6 +3,7 @@ using FluentValidation;
 
 namespace FinanceManager.Application.Accounts.Validators;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class CreateAccountValidator : AbstractValidator<CreateAccountDto>
 {
     public CreateAccountValidator()
