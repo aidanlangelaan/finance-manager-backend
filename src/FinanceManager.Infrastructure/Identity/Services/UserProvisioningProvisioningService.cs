@@ -1,13 +1,11 @@
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-using FinanceManager.Application.Interfaces;
+using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Domain.Entities;
 using FinanceManager.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace FinanceManager.Infrastructure.Services;
+namespace FinanceManager.Infrastructure.Identity.Services;
 
-public class UserService(AppDbContext dbContext) : IUserService
+public class UserProvisioningProvisioningService(AppDbContext dbContext) : IUserProvisioningService
 {
     public async Task<User> GetOrCreateUserAsync(Guid keycloakId, string? name, string? email)
     {
@@ -25,7 +23,7 @@ public class UserService(AppDbContext dbContext) : IUserService
             {
                 throw new InvalidOperationException("Email is required for user creation.");
             }
-            
+
             user = new User
             {
                 KeycloakId = keycloakId,

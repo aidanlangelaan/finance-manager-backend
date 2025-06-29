@@ -1,4 +1,4 @@
-using FinanceManager.Application.Interfaces;
+using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Domain.Entities;
 using FinanceManager.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;

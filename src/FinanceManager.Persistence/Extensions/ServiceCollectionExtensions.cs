@@ -1,3 +1,6 @@
+using FinanceManager.Application.Common.Interfaces.Persistence;
+using FinanceManager.Persistence.Repositories;
+using FinanceManager.Persistence.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,10 +11,14 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("AppDbContext");
+        services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        services.AddDbContext<AppDbContext>((sp, options) =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            options.UseNpgsql(config.GetConnectionString("AppDbContext"));
+        });
 
         return services;
     }

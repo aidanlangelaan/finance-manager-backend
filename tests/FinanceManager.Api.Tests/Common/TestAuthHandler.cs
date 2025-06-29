@@ -3,18 +3,17 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace FinanceManager.Api.Tests.Common;
 
-public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class TestAuthHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder,
+    ISystemClock clock)
+    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder, clock)
 {
-    public TestAuthHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock)
-        : base(options, logger, encoder, clock) { }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var claims = new[]

@@ -7,11 +7,11 @@ public class Category : AuditableEntity
 {
     [Required]
     [Column(TypeName = "varchar(100)")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [Column(TypeName = "int")]
     public int? ParentCategoryId { get; set; }
-    
+
     // Foreign keys
     [ForeignKey("ParentCategoryId")]
     public Category? ParentCategory { get; set; }

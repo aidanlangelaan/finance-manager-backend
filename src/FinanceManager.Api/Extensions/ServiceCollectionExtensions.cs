@@ -1,5 +1,6 @@
 using FinanceManager.Application;
-using FinanceManager.Infrastructure;
+using FinanceManager.Application.Extensions;
+using FinanceManager.Infrastructure.Identity.Services;
 using FinanceManager.Persistence.Extensions;
 
 namespace FinanceManager.Api.Extensions;

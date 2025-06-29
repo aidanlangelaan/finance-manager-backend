@@ -1,5 +1,4 @@
-using System.Security.Claims;
-using FinanceManager.Application.Interfaces;
+using FinanceManager.Application.Common.Interfaces;
 
 namespace FinanceManager.Api.Endpoints;
 
@@ -19,7 +18,7 @@ public static class UserEndpoints
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest);
     }
-    
+
     private static IResult GetMeAsync(ICurrentUserService currentUser, CancellationToken ct)
     {
         if (!currentUser.IsAuthenticated || currentUser.KeycloakId is null)

@@ -7,8 +7,8 @@ public class Tag : AuditableEntity
 {
     [Required]
     [Column(TypeName = "varchar(100)")]
-    public string Name { get; set; }
-    
+    public required string Name { get; set; }
+
     // Relationships
     public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

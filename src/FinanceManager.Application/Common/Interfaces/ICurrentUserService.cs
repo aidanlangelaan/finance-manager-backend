@@ -1,4 +1,4 @@
-namespace FinanceManager.Application.Interfaces;
+namespace FinanceManager.Application.Common.Interfaces;
 
 public interface ICurrentUserService
 {

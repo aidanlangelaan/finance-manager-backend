@@ -3,7 +3,7 @@ using FinanceManager.Api.Extensions;
 using FinanceManager.Api.Middleware;
 using FinanceManager.Api.OpenApi;
 using FinanceManager.Api.Services;
-using FinanceManager.Application.Interfaces;
+using FinanceManager.Application.Common.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;

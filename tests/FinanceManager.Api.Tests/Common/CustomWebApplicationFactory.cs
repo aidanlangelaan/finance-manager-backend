@@ -1,8 +1,7 @@
-﻿using FinanceManager.Application.Interfaces;
+﻿using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.TestUtilities.Auth;
 using FinanceManager.TestUtilities.Time;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

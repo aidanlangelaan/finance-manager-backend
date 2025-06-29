@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using FinanceManager.Application.Interfaces;
+using FinanceManager.Application.Common.Interfaces;
 
 namespace FinanceManager.Api.Services;
 
@@ -9,7 +9,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
     {
         get
         {
-            var sub = httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
+            var sub = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return Guid.TryParse(sub, out var guid) ? guid : null;
         }
     }
