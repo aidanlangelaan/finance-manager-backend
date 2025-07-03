@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using FinanceManager.Application.Accounts.Interfaces;
 using Microsoft.Extensions.Time.Testing;
+using Moq;
 
 namespace FinanceManager.Api.Tests.Common;
 
@@ -16,6 +18,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     public FakeTimeProvider FakeClock { get; } = TestClockFactory.CreateFixed(DateTimeOffset.UtcNow);
 
+    public Mock<IAccountService> AccountServiceMock { get; } = new();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -23,8 +27,17 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<ICurrentUserService>();
             services.AddSingleton<ICurrentUserService>(TestUser);
 
+            services.RemoveAll<IUserProvisioningService>();
+            var userProvisioningServiceMock = new Mock<IUserProvisioningService>();
+            userProvisioningServiceMock.Setup(s => s.GetOrCreateUserAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new FinanceManager.Domain.Entities.User { Id = 1, KeycloakId = Guid.NewGuid(), DisplayName = "Test User", Email = "test@example.com" });
+            services.AddSingleton<IUserProvisioningService>(userProvisioningServiceMock.Object);
+
             services.RemoveAll<TimeProvider>();
             services.AddSingleton<TimeProvider>(FakeClock);
+
+            services.RemoveAll<IAccountService>();
+            services.AddSingleton<IAccountService>(AccountServiceMock.Object);
 
             services.AddAuthentication("TestScheme")
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", options => { });

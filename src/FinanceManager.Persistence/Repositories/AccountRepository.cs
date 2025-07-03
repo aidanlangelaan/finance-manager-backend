@@ -20,10 +20,9 @@ public class AccountRepository(AppDbContext context) : IAccountRepository
             .OrderBy(a => a.Name);
     }
 
-    public Task AddAsync(Account account, CancellationToken ct)
+    public async Task AddAsync(Account account, CancellationToken ct)
     {
-        context.Accounts.Add(account);
-        return Task.CompletedTask;
+        await context.Accounts.AddAsync(account, ct);
     }
 
     public Task UpdateAsync(Account account, CancellationToken ct)

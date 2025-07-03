@@ -12,8 +12,8 @@ public class UpdateAccountViewModelValidator : AbstractValidator<UpdateAccountVi
             .MaximumLength(255);
 
         RuleFor(x => x.Type)
-            .NotEmpty()
-            .WithMessage("Account type is required.");
+            .IsInEnum()
+            .WithMessage("Account type is invalid.");
 
         RuleFor(x => x.Description)
             .MaximumLength(255);

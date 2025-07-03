@@ -3,14 +3,15 @@ using FinanceManager.Application.Accounts.Interfaces;
 using FinanceManager.Application.Accounts.Mapping;
 using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Interfaces.Persistence;
+using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Common.Models.Paging;
-using FinanceManager.Application.Extensions;
 
 namespace FinanceManager.Application.Accounts.Services;
 
 public class AccountService(
     IUnitOfWork unitOfWork,
     ICurrentUserService currentUser,
+    IPagingService pagingService,
     AccountMapper mapper) : IAccountService
 {
     public async Task<AccountResponseDto?> GetByIdAsync(int id, CancellationToken ct)
@@ -22,7 +23,7 @@ public class AccountService(
     public async Task<PagedResult<AccountResponseDto>> GetAllAsync(PagedRequest paging, CancellationToken ct)
     {
         var query = unitOfWork.Accounts.GetAllAsync(currentUser.UserId);
-        return await query.ToPagedResultAsync(paging, mapper.ToDto, ct);
+        return await pagingService.ToPagedResultAsync(query, paging, mapper.ToDto, ct);
     }
 
     public async Task<int> CreateAsync(CreateAccountDto dto, CancellationToken ct)
