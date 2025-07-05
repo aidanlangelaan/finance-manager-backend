@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Testing", "1. Testing", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.Persistence.Tests", "..\tests\FinanceManager.Persistence.Tests\FinanceManager.Persistence.Tests.csproj", "{A96DF83C-E5A4-4669-A89F-1649086FAA62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.Infrastructure.Tests", "..\tests\FinanceManager.Infrastructure.Tests\FinanceManager.Infrastructure.Tests.csproj", "{2089EAA7-5B71-429E-9CFF-E25DC35B1076}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,18 @@ Global
 		{A96DF83C-E5A4-4669-A89F-1649086FAA62}.Release|x64.Build.0 = Release|Any CPU
 		{A96DF83C-E5A4-4669-A89F-1649086FAA62}.Release|x86.ActiveCfg = Release|Any CPU
 		{A96DF83C-E5A4-4669-A89F-1649086FAA62}.Release|x86.Build.0 = Release|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Debug|x64.Build.0 = Debug|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Debug|x86.Build.0 = Debug|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Release|x64.ActiveCfg = Release|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Release|x64.Build.0 = Release|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Release|x86.ActiveCfg = Release|Any CPU
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,5 +171,6 @@ Global
 		{67112C41-CD94-4141-AE4A-27DB7F4E6471} = {82A6F179-B104-45D2-B5CA-4D1AB17A67DB}
 		{0DE5462D-A1F8-47E4-B15B-70B6F5A5663E} = {82A6F179-B104-45D2-B5CA-4D1AB17A67DB}
 		{A96DF83C-E5A4-4669-A89F-1649086FAA62} = {82A6F179-B104-45D2-B5CA-4D1AB17A67DB}
+		{2089EAA7-5B71-429E-9CFF-E25DC35B1076} = {82A6F179-B104-45D2-B5CA-4D1AB17A67DB}
 	EndGlobalSection
 EndGlobal

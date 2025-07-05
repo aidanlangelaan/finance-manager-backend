@@ -11,11 +11,11 @@ public class AppDbContext(
     TimeProvider timeProvider)
     : DbContext(options)
 {
-    public DbSet<Account> Accounts { get; set; }
-    public DbSet<Transaction> Transactions { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<Tag> Tags { get; set; }
+    public virtual DbSet<Account> Accounts { get; set; }
+    public virtual DbSet<Transaction> Transactions { get; set; }
+    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Tag> Tags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
