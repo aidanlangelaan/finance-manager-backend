@@ -42,6 +42,8 @@ builder.Services.AddOpenApi("v1", options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddProblemDetails();
 builder.Services.AddOpenApiDocument(config =>
 {
     config.Title = "Personal Finance Manager - API";

@@ -26,7 +26,8 @@ public static class AccountsEndpoints
         group.MapGet("/{id:int}", GetAccountByIdAsync)
             .WithName("GetAccountById")
             .WithSummary("Get account by ID")
-            .WithDescription("Returns the details of a specific account by its ID if it belongs to the authenticated user.")
+            .WithDescription(
+                "Returns the details of a specific account by its ID if it belongs to the authenticated user.")
             .Produces<AccountViewModel>(StatusCodes.Status200OK, "application/json")
             .Produces(StatusCodes.Status404NotFound);
 
@@ -119,4 +120,3 @@ public static class AccountsEndpoints
         return success ? Results.NoContent() : Results.NotFound();
     }
 }
-

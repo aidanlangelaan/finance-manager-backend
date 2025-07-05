@@ -7,12 +7,7 @@ namespace FinanceManager.Api.Tests.ViewModels.Account;
 
 public class UpdateAccountViewModelValidatorTests
 {
-    private readonly UpdateAccountViewModelValidator _validator;
-
-    public UpdateAccountViewModelValidatorTests()
-    {
-        _validator = new UpdateAccountViewModelValidator();
-    }
+    private readonly UpdateAccountViewModelValidator _validator = new();
 
     [Fact]
     public void ShouldHaveError_WhenNameIsEmpty()

@@ -4,6 +4,9 @@ using FinanceManager.Application.Accounts.Services;
 using FinanceManager.Application.Accounts.Validators;
 using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Common.Services;
+using FinanceManager.Application.Transactions.Interfaces;
+using FinanceManager.Application.Transactions.Mapping;
+using FinanceManager.Application.Transactions.Services;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,10 +22,12 @@ public static class ServiceCollectionExtensions
 
         // services
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IPagingService, PagingService>();
 
         // mapping
         services.AddSingleton<AccountMapper>();
+        services.AddSingleton<TransactionMapper>();
 
         return services;
     }

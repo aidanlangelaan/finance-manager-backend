@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Shouldly;
-using System;
-using System.Threading.Tasks;
 
 namespace FinanceManager.Infrastructure.Tests.Identity.Services;
 

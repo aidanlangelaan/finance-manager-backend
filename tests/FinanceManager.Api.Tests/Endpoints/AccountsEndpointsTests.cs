@@ -104,7 +104,7 @@ public class AccountsEndpointsTests(CustomWebApplicationFactory factory) : IClas
         var client = factory.CreateClient();
         var nonExistentAccountId = 999;
         factory.AccountServiceMock.Setup(s => s.GetByIdAsync(nonExistentAccountId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((AccountResponseDto)null);
+            .ReturnsAsync(null as AccountResponseDto);
 
         // Act
         var response = await client.GetAsync($"/api/accounts/{nonExistentAccountId}");

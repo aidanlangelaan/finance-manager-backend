@@ -15,12 +15,29 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         {
             logger.LogError(ex, "An unhandled exception occurred");
 
-            context.Response.ContentType = "application/json";
-
             if (ex is MissingClaimException)
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                await context.Response.WriteAsJsonAsync(new { Message = "Access denied." });
+                context.Response.ContentType = "application/problem+json";
+                await context.Response.WriteAsJsonAsync(new ProblemDetails
+                {
+                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
+                    Title = "Forbidden",
+                    Status = StatusCodes.Status403Forbidden,
+                    Detail = "Access denied."
+                });
+            }
+            else if (ex is FinanceManager.Application.Common.Exceptions.NotFoundException notFoundException)
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                context.Response.ContentType = "application/problem+json";
+                await context.Response.WriteAsJsonAsync(new ProblemDetails
+                {
+                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
+                    Title = "Not Found",
+                    Status = StatusCodes.Status404NotFound,
+                    Detail = notFoundException.Message
+                });
             }
             else if (ex is FluentValidation.ValidationException validationException)
             {
@@ -43,7 +60,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
                     Status = StatusCodes.Status500InternalServerError,
                     Detail = "An unexpected error occurred."
                 });
-                context.Response.ContentType = "application/json";
+                context.Response.ContentType = "application/problem+json";
             }
         }
     }

@@ -8,11 +8,7 @@ namespace FinanceManager.Persistence.Tests.Repositories;
 
 public class AccountRepositoryTests : PersistenceTestBase
 {
-    private AccountRepository _sut;
-
-    public AccountRepositoryTests()
-    {
-    }
+    private AccountRepository _sut = null!;
 
     public override async Task InitializeAsync()
     {
