@@ -1,7 +1,6 @@
 using FinanceManager.Api.ViewModels.Transaction;
 using FinanceManager.Api.ViewModels.Transaction.Mapping;
 using FinanceManager.Application.Common.Models.Paging;
-using FinanceManager.Application.Transactions.Dtos;
 using FinanceManager.Application.Transactions.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +34,7 @@ public static class TransactionsEndpoints
             .WithName("CreateTransaction")
             .WithSummary("Create a new transaction")
             .WithDescription("Creates a new transaction for the authenticated user.")
-            .Accepts<CreateTransactionDto>("application/json")
+            .Accepts<CreateTransactionViewModel>("application/json")
             .Produces<int>(StatusCodes.Status201Created, "application/json")
             .ProducesValidationProblem();
 
@@ -43,7 +42,7 @@ public static class TransactionsEndpoints
             .WithName("UpdateTransaction")
             .WithSummary("Update an transaction")
             .WithDescription("Updates an existing transaction owned by the authenticated user.")
-            .Accepts<UpdateTransactionDto>("application/json")
+            .Accepts<UpdateTransactionViewModel>("application/json")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesValidationProblem();
@@ -83,31 +82,33 @@ public static class TransactionsEndpoints
     }
 
     private static async Task<IResult> CreateTransactionAsync(
-        [FromBody] CreateTransactionDto dto,
-        IValidator<CreateTransactionDto> validator,
+        [FromBody] CreateTransactionViewModel viewModel,
+        IValidator<CreateTransactionViewModel> validator,
         ITransactionService service,
+        TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(dto, ct);
+        var validation = await validator.ValidateAsync(viewModel, ct);
         if (!validation.IsValid)
             return Results.ValidationProblem(validation.ToDictionary());
 
-        var id = await service.CreateAsync(dto, ct);
+        var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
         return Results.Created($"/api/transactions/{id}", id);
     }
 
     private static async Task<IResult> UpdateTransactionAsync(
         int id,
-        [FromBody] UpdateTransactionDto dto,
-        IValidator<UpdateTransactionDto> validator,
+        [FromBody] UpdateTransactionViewModel viewModel,
+        IValidator<UpdateTransactionViewModel> validator,
         ITransactionService service,
+        TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(dto, ct);
+        var validation = await validator.ValidateAsync(viewModel, ct);
         if (!validation.IsValid)
             return Results.ValidationProblem(validation.ToDictionary());
 
-        var success = await service.UpdateAsync(id, dto, ct);
+        var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
         return success ? Results.NoContent() : Results.NotFound();
     }
 

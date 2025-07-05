@@ -1,4 +1,3 @@
-using FinanceManager.Application.Accounts.Dtos;
 using FinanceManager.Application.Accounts.Interfaces;
 using FinanceManager.Application.Common.Models.Paging;
 using FluentValidation;
@@ -35,7 +34,7 @@ public static class AccountsEndpoints
             .WithName("CreateAccount")
             .WithSummary("Create a new account")
             .WithDescription("Creates a new account for the authenticated user.")
-            .Accepts<CreateAccountDto>("application/json")
+            .Accepts<CreateAccountViewModel>("application/json")
             .Produces<int>(StatusCodes.Status201Created, "application/json")
             .ProducesValidationProblem();
 
@@ -43,7 +42,7 @@ public static class AccountsEndpoints
             .WithName("UpdateAccount")
             .WithSummary("Update an account")
             .WithDescription("Updates an existing account owned by the authenticated user.")
-            .Accepts<UpdateAccountDto>("application/json")
+            .Accepts<UpdateAccountViewModel>("application/json")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesValidationProblem();
@@ -83,31 +82,33 @@ public static class AccountsEndpoints
     }
 
     private static async Task<IResult> CreateAccountAsync(
-        [FromBody] CreateAccountDto dto,
-        IValidator<CreateAccountDto> validator,
+        [FromBody] CreateAccountViewModel viewModel,
+        IValidator<CreateAccountViewModel> validator,
         IAccountService service,
+        AccountViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(dto, ct);
+        var validation = await validator.ValidateAsync(viewModel, ct);
         if (!validation.IsValid)
             return Results.ValidationProblem(validation.ToDictionary());
 
-        var id = await service.CreateAsync(dto, ct);
+        var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
         return Results.Created($"/api/accounts/{id}", id);
     }
 
     private static async Task<IResult> UpdateAccountAsync(
         int id,
-        [FromBody] UpdateAccountDto dto,
-        IValidator<UpdateAccountDto> validator,
+        [FromBody] UpdateAccountViewModel viewModel,
+        IValidator<UpdateAccountViewModel> validator,
         IAccountService service,
+        AccountViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(dto, ct);
+        var validation = await validator.ValidateAsync(viewModel, ct);
         if (!validation.IsValid)
             return Results.ValidationProblem(validation.ToDictionary());
 
-        var success = await service.UpdateAsync(id, dto, ct);
+        var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
         return success ? Results.NoContent() : Results.NotFound();
     }
 

@@ -82,7 +82,7 @@ app.UseMiddleware<UserIdentificationMiddleware>();
 // Enable OpenAPI and Scalar API reference
 app.UseOpenApi();
 app.MapOpenApi();
-app.MapScalarApiReference((options, context) =>
+app.MapScalarApiReference((options, _) =>
 {
     options.Title = "Personal Finance Manager - API";
     options.Theme = ScalarTheme.Laserwave;

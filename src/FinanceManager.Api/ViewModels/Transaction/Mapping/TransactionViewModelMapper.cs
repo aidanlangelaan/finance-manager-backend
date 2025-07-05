@@ -7,4 +7,6 @@ namespace FinanceManager.Api.ViewModels.Transaction.Mapping;
 public partial class TransactionViewModelMapper
 {
     public partial TransactionViewModel ToViewModel(TransactionResponseDto dto);
+    public partial CreateTransactionDto ToDto(CreateTransactionViewModel viewModel);
+    public partial UpdateTransactionDto ToDto(UpdateTransactionViewModel viewModel);
 }

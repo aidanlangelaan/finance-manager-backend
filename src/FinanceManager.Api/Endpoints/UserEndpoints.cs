@@ -28,7 +28,7 @@ public static class UserEndpoints
         {
             UserId = currentUser.KeycloakId,
             Name = currentUser.DisplayName,
-            Email = currentUser.Email
+            currentUser.Email
         });
     }
 }

@@ -1,6 +1,4 @@
-﻿using FinanceManager.Domain.Enums;
-
-namespace FinanceManager.Api.ViewModels.Transaction;
+﻿namespace FinanceManager.Api.ViewModels.Transaction;
 
 public class UpdateTransactionViewModel
 {
