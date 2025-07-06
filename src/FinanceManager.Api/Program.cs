@@ -48,7 +48,7 @@ builder.Services.AddOpenApiDocument(config =>
 {
     config.Title = "Personal Finance Manager - API";
     config.Version = "v1";
-    config.Description = "API for managing personal finances, including transactions and accounts.";
+    config.Description = "API for managing personal finances.";
 
     config.AddSecurity("Bearer", [], new OpenApiSecurityScheme
     {
@@ -94,8 +94,10 @@ app.MapScalarApiReference((options, _) =>
 });
 
 // Group and map endpoints
-app.MapTransactionEndpoints();
 app.MapAccountEndpoints();
+app.MapCategoryEndpoints();
+app.MapTagEndpoints();
+app.MapTransactionEndpoints();
 app.MapUserEndpoints();
 
 app.Run();

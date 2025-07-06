@@ -1,6 +1,7 @@
 using FinanceManager.Api.Common.Validators;
 using FinanceManager.Api.ViewModels.Account.Mapping;
 using FinanceManager.Api.ViewModels.Category.Mapping;
+using FinanceManager.Api.ViewModels.Tag.Mapping;
 using FinanceManager.Api.ViewModels.Transaction.Mapping;
 using FluentValidation;
 
@@ -15,6 +16,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<AccountViewModelMapper>();
         services.AddSingleton<CategoryViewModelMapper>();
+        services.AddSingleton<TagViewModelMapper>();
         services.AddSingleton<TransactionViewModelMapper>();
 
         return services;

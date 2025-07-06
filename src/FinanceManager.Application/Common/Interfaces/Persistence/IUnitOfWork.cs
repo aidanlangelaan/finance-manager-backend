@@ -6,6 +6,8 @@ public interface IUnitOfWork
 
     ICategoryRepository Categories { get; }
 
+    ITagRepository Tags { get; }
+
     ITransactionRepository Transactions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

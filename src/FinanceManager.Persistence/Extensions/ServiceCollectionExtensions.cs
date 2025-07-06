@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
