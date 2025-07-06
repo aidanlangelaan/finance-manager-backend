@@ -20,7 +20,7 @@ public class AccountsEndpointsTests(CustomWebApplicationFactory factory) : IClas
         var client = factory.CreateClient();
         var createAccountViewModel = new CreateAccountViewModel
         {
-            Name = "Test Account",
+            Name = "Test",
             Type = Domain.Enums.AccountType.Asset,
             CurrentBalance = 1000
         };
@@ -85,7 +85,7 @@ public class AccountsEndpointsTests(CustomWebApplicationFactory factory) : IClas
         var client = factory.CreateClient();
         var accountId = 1;
         factory.AccountServiceMock.Setup(s => s.GetByIdAsync(accountId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AccountResponseDto { Id = accountId, Name = "Test Account", Type = Domain.Enums.AccountType.Asset, CurrentBalance = 1000 });
+            .ReturnsAsync(new AccountResponseDto { Id = accountId, Name = "Test", Type = Domain.Enums.AccountType.Asset, CurrentBalance = 1000 });
 
         // Act
         var response = await client.GetAsync($"/api/accounts/{accountId}");

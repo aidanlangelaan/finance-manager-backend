@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using FinanceManager.Application.Accounts.Interfaces;
+using FinanceManager.Application.Categories.Interfaces;
+using FinanceManager.Application.Tags.Interfaces;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
 
@@ -19,6 +21,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public FakeTimeProvider FakeClock { get; } = TestClockFactory.CreateFixed(DateTimeOffset.UtcNow);
 
     public Mock<IAccountService> AccountServiceMock { get; } = new();
+    public Mock<ICategoryService> CategoryServiceMock { get; } = new();
+    public Mock<ITagService> TagServiceMock { get; } = new();
+
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -38,6 +43,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<IAccountService>();
             services.AddSingleton<IAccountService>(AccountServiceMock.Object);
+
+            services.RemoveAll<ICategoryService>();
+            services.AddSingleton<ICategoryService>(CategoryServiceMock.Object);
+
+            services.RemoveAll<ITagService>();
+            services.AddSingleton<ITagService>(TagServiceMock.Object);
 
             services.AddAuthentication("TestScheme")
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", options => { });

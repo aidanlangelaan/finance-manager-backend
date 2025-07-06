@@ -28,7 +28,7 @@ public class ExceptionHandlingMiddlewareTests
 
         // Assert
         context.Response.StatusCode.ShouldBe((int)HttpStatusCode.InternalServerError);
-        context.Response.ContentType.ShouldStartWith("application/json");
+        context.Response.ContentType.ShouldStartWith("application/problem+json");
 
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var reader = new StreamReader(context.Response.Body);

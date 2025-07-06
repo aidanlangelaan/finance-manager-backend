@@ -12,7 +12,7 @@ public class CreateAccountViewModelValidator : AbstractValidator<CreateAccountVi
             .MaximumLength(255);
 
         RuleFor(x => x.Type)
-            .NotEmpty()
+            .IsInEnum()
             .WithMessage("Account type is required.");
 
         RuleFor(x => x.Description)
