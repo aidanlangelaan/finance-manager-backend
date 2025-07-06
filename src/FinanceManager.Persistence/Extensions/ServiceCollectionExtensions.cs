@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
     public static void RegisterPersistenceServices(this IServiceCollection services, IConfiguration _)
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();

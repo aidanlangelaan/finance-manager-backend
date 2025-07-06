@@ -1,4 +1,3 @@
-using FinanceManager.Api.Common.Validators;
 using FinanceManager.Api.Extensions;
 using FinanceManager.Api.ViewModels.Account.Mapping;
 using FinanceManager.Application.Common.Models.Paging;
@@ -6,7 +5,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
 
 namespace FinanceManager.Api.Tests.Extensions;
 
