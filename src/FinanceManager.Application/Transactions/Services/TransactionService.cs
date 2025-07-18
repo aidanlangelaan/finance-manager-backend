@@ -5,7 +5,7 @@ using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Interfaces.Persistence;
 using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Common.Models.Paging;
-using FinanceManager.Application.Common.Exceptions; // Added this using directive
+using FinanceManager.Application.Common.Exceptions;
 
 namespace FinanceManager.Application.Transactions.Services;
 
@@ -45,13 +45,12 @@ public class TransactionService(
 
         if (dto.CategoryId.HasValue)
         {
-            // TODO: Uncomment when categories are implemented
-            // var category =
-            //     await unitOfWork.Category.GetByIdAsync(dto.CategoryId, currentUser.UserId, ct);
-            // if (category == null)
-            // {
-            //     throw new NotFoundException($"Category with ID {dto.DestinationAccountId} not found.");
-            // }
+            var category =
+                await unitOfWork.Categories.GetByIdAsync(dto.CategoryId.Value, currentUser.UserId, ct);
+            if (category == null)
+            {
+                throw new NotFoundException($"Category with ID {dto.CategoryId.Value} not found.");
+            }
         }
 
         var entity = mapper.ToEntity(dto);
@@ -83,13 +82,12 @@ public class TransactionService(
 
         if (dto.CategoryId.HasValue)
         {
-            // TODO: Uncomment when categories are implemented
-            // var category =
-            //     await unitOfWork.Category.GetByIdAsync(dto.CategoryId, currentUser.UserId, ct);
-            // if (category == null)
-            // {
-            //     throw new NotFoundException($"Category with ID {dto.DestinationAccountId} not found.");
-            // }
+            var category =
+                await unitOfWork.Categories.GetByIdAsync(dto.CategoryId.Value, currentUser.UserId, ct);
+            if (category == null)
+            {
+                throw new NotFoundException($"Category with ID {dto.CategoryId.Value} not found.");
+            }
         }
 
         mapper.UpdateEntity(dto, account);

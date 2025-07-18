@@ -9,5 +9,6 @@ public class UpdateAccountValidator : AbstractValidator<UpdateAccountDto>
     public UpdateAccountValidator()
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Type).IsInEnum();
     }
 }

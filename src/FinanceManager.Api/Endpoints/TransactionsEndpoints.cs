@@ -4,6 +4,7 @@ using FinanceManager.Application.Common.Models.Paging;
 using FinanceManager.Application.Transactions.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using FinanceManager.Application.Common.Exceptions;
 
 namespace FinanceManager.Api.Endpoints;
 
@@ -108,8 +109,15 @@ public static class TransactionsEndpoints
         if (!validation.IsValid)
             return Results.ValidationProblem(validation.ToDictionary());
 
-        var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
-        return success ? Results.NoContent() : Results.NotFound();
+        try
+        {
+            var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
+            return success ? Results.NoContent() : Results.NotFound();
+        }
+        catch (NotFoundException)
+        {
+            return Results.NotFound();
+        }
     }
 
     private static async Task<IResult> DeleteTransactionAsync(
