@@ -23,6 +23,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public Mock<IAccountService> AccountServiceMock { get; } = new();
     public Mock<ICategoryService> CategoryServiceMock { get; } = new();
     public Mock<ITagService> TagServiceMock { get; } = new();
+    public Mock<FinanceManager.Application.Transactions.Interfaces.ITransactionService> TransactionServiceMock { get; } = new();
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -49,6 +50,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<ITagService>();
             services.AddSingleton<ITagService>(TagServiceMock.Object);
+
+            services.RemoveAll<FinanceManager.Application.Transactions.Interfaces.ITransactionService>();
+            services.AddSingleton<FinanceManager.Application.Transactions.Interfaces.ITransactionService>(TransactionServiceMock.Object);
 
             services.AddAuthentication("TestScheme")
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", options => { });

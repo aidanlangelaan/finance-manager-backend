@@ -4,20 +4,20 @@ using Shouldly;
 
 namespace FinanceManager.Application.Tests.Validators;
 
-public class CreateTransactionValidatorTestsNew
+public class UpdateTransactionValidatorTests
 {
-    private readonly CreateTransactionValidator _validator;
+    private readonly UpdateTransactionValidator _validator;
 
-    public CreateTransactionValidatorTestsNew()
+    public UpdateTransactionValidatorTests()
     {
-        _validator = new CreateTransactionValidator();
+        _validator = new UpdateTransactionValidator();
     }
 
     [Fact]
     public void ShouldHaveError_WhenSourceAccountIdIsEmpty()
     {
         // Arrange
-        var dto = new CreateTransactionDto
+        var dto = new UpdateTransactionDto
         {
             SourceAccountId = 0, // Invalid
             DestinationAccountId = 1,
@@ -31,14 +31,14 @@ public class CreateTransactionValidatorTestsNew
 
         // Assert
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateTransactionDto.SourceAccountId));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(UpdateTransactionDto.SourceAccountId));
     }
 
     [Fact]
     public void ShouldHaveError_WhenDestinationAccountIdIsEmpty()
     {
         // Arrange
-        var dto = new CreateTransactionDto
+        var dto = new UpdateTransactionDto
         {
             SourceAccountId = 1,
             DestinationAccountId = 0, // Invalid
@@ -52,14 +52,14 @@ public class CreateTransactionValidatorTestsNew
 
         // Assert
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateTransactionDto.DestinationAccountId));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(UpdateTransactionDto.DestinationAccountId));
     }
 
     [Fact]
     public void ShouldHaveError_WhenDateIsEmpty()
     {
         // Arrange
-        var dto = new CreateTransactionDto
+        var dto = new UpdateTransactionDto
         {
             SourceAccountId = 1,
             DestinationAccountId = 2,
@@ -73,14 +73,14 @@ public class CreateTransactionValidatorTestsNew
 
         // Assert
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateTransactionDto.Date));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(UpdateTransactionDto.Date));
     }
 
     [Fact]
     public void ShouldHaveError_WhenDescriptionIsTooLong()
     {
         // Arrange
-        var dto = new CreateTransactionDto
+        var dto = new UpdateTransactionDto
         {
             SourceAccountId = 1,
             DestinationAccountId = 2,
@@ -94,14 +94,14 @@ public class CreateTransactionValidatorTestsNew
 
         // Assert
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateTransactionDto.Description));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(UpdateTransactionDto.Description));
     }
 
     [Fact]
     public void ShouldNotHaveError_WhenDtoIsValid()
     {
         // Arrange
-        var dto = new CreateTransactionDto
+        var dto = new UpdateTransactionDto
         {
             SourceAccountId = 1,
             DestinationAccountId = 2,
@@ -115,15 +115,5 @@ public class CreateTransactionValidatorTestsNew
 
         // Assert
         result.IsValid.ShouldBeTrue();
-    }
-
-    [Fact]
-    public void Constructor_ShouldBeCovered()
-    {
-        // Arrange & Act
-        var validator = new CreateTransactionValidator();
-
-        // Assert
-        validator.ShouldNotBeNull();
     }
 }
