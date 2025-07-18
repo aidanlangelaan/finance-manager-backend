@@ -1,4 +1,4 @@
-﻿using FinanceManager.Application.Common.Models.Paging;
+using FinanceManager.Application.Common.Models.Paging;
 using FluentValidation;
 
 namespace FinanceManager.Api.Common.Validators;

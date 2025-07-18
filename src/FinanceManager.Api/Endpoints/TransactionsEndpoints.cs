@@ -5,6 +5,7 @@ using FinanceManager.Application.Transactions.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using FinanceManager.Application.Common.Exceptions;
+using FinanceManager.Api.Common.Filters;
 
 namespace FinanceManager.Api.Endpoints;
 
@@ -35,6 +36,7 @@ public static class TransactionsEndpoints
             .WithName("CreateTransaction")
             .WithSummary("Create a new transaction")
             .WithDescription("Creates a new transaction for the authenticated user.")
+            .AddEndpointFilter<ValidationFilter<CreateTransactionViewModel>>()
             .Accepts<CreateTransactionViewModel>("application/json")
             .Produces<int>(StatusCodes.Status201Created, "application/json")
             .ProducesValidationProblem();
@@ -43,6 +45,7 @@ public static class TransactionsEndpoints
             .WithName("UpdateTransaction")
             .WithSummary("Update an transaction")
             .WithDescription("Updates an existing transaction owned by the authenticated user.")
+            .AddEndpointFilter<ValidationFilter<UpdateTransactionViewModel>>()
             .Accepts<UpdateTransactionViewModel>("application/json")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
@@ -84,15 +87,10 @@ public static class TransactionsEndpoints
 
     private static async Task<IResult> CreateTransactionAsync(
         [FromBody] CreateTransactionViewModel viewModel,
-        IValidator<CreateTransactionViewModel> validator,
         ITransactionService service,
         TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(viewModel, ct);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(validation.ToDictionary());
-
         var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
         return Results.Created($"/api/transactions/{id}", id);
     }
@@ -100,15 +98,10 @@ public static class TransactionsEndpoints
     private static async Task<IResult> UpdateTransactionAsync(
         int id,
         [FromBody] UpdateTransactionViewModel viewModel,
-        IValidator<UpdateTransactionViewModel> validator,
         ITransactionService service,
         TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(viewModel, ct);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(validation.ToDictionary());
-
         try
         {
             var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);

@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using FinanceManager.Api.ViewModels.Category;
 using FinanceManager.Api.ViewModels.Category.Mapping;
+using FinanceManager.Api.Common.Filters;
 
 namespace FinanceManager.Api.Endpoints;
 
@@ -34,6 +35,7 @@ public static class CategoriesEndpoints
             .WithName("CreateCategory")
             .WithSummary("Create a new category")
             .WithDescription("Creates a new category for the authenticated user.")
+            .AddEndpointFilter<ValidationFilter<CreateCategoryViewModel>>()
             .Accepts<CreateCategoryViewModel>("application/json")
             .Produces<int>(StatusCodes.Status201Created, "application/json")
             .ProducesValidationProblem();
@@ -42,6 +44,7 @@ public static class CategoriesEndpoints
             .WithName("UpdateCategory")
             .WithSummary("Update an category")
             .WithDescription("Updates an existing category owned by the authenticated user.")
+            .AddEndpointFilter<ValidationFilter<UpdateCategoryViewModel>>()
             .Accepts<UpdateCategoryViewModel>("application/json")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
@@ -83,15 +86,10 @@ public static class CategoriesEndpoints
 
     private static async Task<IResult> CreateCategoryAsync(
         [FromBody] CreateCategoryViewModel viewModel,
-        IValidator<CreateCategoryViewModel> validator,
         ICategoryService service,
         CategoryViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(viewModel, ct);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(validation.ToDictionary());
-
         var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
         return Results.Created($"/api/categories/{id}", id);
     }
@@ -99,15 +97,10 @@ public static class CategoriesEndpoints
     private static async Task<IResult> UpdateCategoryAsync(
         int id,
         [FromBody] UpdateCategoryViewModel viewModel,
-        IValidator<UpdateCategoryViewModel> validator,
         ICategoryService service,
         CategoryViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(viewModel, ct);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(validation.ToDictionary());
-
         var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
         return success ? Results.NoContent() : Results.NotFound();
     }

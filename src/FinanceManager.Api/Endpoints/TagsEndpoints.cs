@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using FinanceManager.Api.ViewModels.Tag;
 using FinanceManager.Api.ViewModels.Tag.Mapping;
+using FinanceManager.Api.Common.Filters;
 
 namespace FinanceManager.Api.Endpoints;
 
@@ -34,6 +35,7 @@ public static class TagsEndpoints
             .WithName("CreateTag")
             .WithSummary("Create a new tag")
             .WithDescription("Creates a new tag for the authenticated user.")
+            .AddEndpointFilter<ValidationFilter<CreateTagViewModel>>()
             .Accepts<CreateTagViewModel>("application/json")
             .Produces<int>(StatusCodes.Status201Created, "application/json")
             .ProducesValidationProblem();
@@ -42,6 +44,7 @@ public static class TagsEndpoints
             .WithName("UpdateTag")
             .WithSummary("Update an tag")
             .WithDescription("Updates an existing tag owned by the authenticated user.")
+            .AddEndpointFilter<ValidationFilter<UpdateTagViewModel>>()
             .Accepts<UpdateTagViewModel>("application/json")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
@@ -83,15 +86,10 @@ public static class TagsEndpoints
 
     private static async Task<IResult> CreateTagAsync(
         [FromBody] CreateTagViewModel viewModel,
-        IValidator<CreateTagViewModel> validator,
         ITagService service,
         TagViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(viewModel, ct);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(validation.ToDictionary());
-
         var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
         return Results.Created($"/api/tags/{id}", id);
     }
@@ -99,15 +97,10 @@ public static class TagsEndpoints
     private static async Task<IResult> UpdateTagAsync(
         int id,
         [FromBody] UpdateTagViewModel viewModel,
-        IValidator<UpdateTagViewModel> validator,
         ITagService service,
         TagViewModelMapper mapper,
         CancellationToken ct)
     {
-        var validation = await validator.ValidateAsync(viewModel, ct);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(validation.ToDictionary());
-
         var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
         return success ? Results.NoContent() : Results.NotFound();
     }
