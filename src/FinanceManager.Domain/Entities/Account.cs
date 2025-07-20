@@ -8,6 +8,8 @@ public class Account : AuditableEntity
 
     public required AccountType Type { get; set; }
 
+    public string? Iban { get; set; }
+
     public string? Description { get; set; }
 
     public required decimal CurrentBalance { get; set; }

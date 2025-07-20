@@ -10,6 +10,8 @@ public class UpdateAccountViewModel
 
     public AccountType Type { get; set; }
 
+    public string? Iban { get; set; }
+
     public bool IncludedInNetWorth { get; set; }
 
     public bool CanTransferFrom { get; set; }

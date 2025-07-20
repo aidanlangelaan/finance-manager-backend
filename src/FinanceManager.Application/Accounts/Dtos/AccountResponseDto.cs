@@ -12,6 +12,8 @@ public class AccountResponseDto
 
     public AccountType Type { get; set; }
 
+    public string? Iban { get; set; }
+
     public decimal CurrentBalance { get; set; }
 
     public bool IncludedInNetWorth { get; set; }

@@ -13,9 +13,12 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .IsRequired()
             .HasColumnType("varchar(255)");
 
-        builder.Property(a => a.Type)
+        builder.Property(j => j.Type)
             .IsRequired()
-            .HasColumnType("smallint");
+            .HasConversion<string>();
+
+        builder.Property(a => a.Iban)
+            .HasColumnType("varchar(34)");
 
         builder.Property(a => a.Description)
             .HasColumnType("varchar(255)");
@@ -35,6 +38,9 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(a => a.CanTransferTo)
             .IsRequired()
             .HasColumnType("boolean");
+
+        // Indexes
+        builder.HasIndex(a => new { a.CreatedById, a.Iban });
 
         // Configure relationships
         builder.HasMany(a => a.SourceTransactions)
