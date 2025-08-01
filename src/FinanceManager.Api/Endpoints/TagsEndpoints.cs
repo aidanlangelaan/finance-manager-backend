@@ -1,6 +1,5 @@
 using FinanceManager.Application.Tags.Interfaces;
 using FinanceManager.Application.Common.Models.Paging;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using FinanceManager.Api.ViewModels.Tag;
 using FinanceManager.Api.ViewModels.Tag.Mapping;
@@ -60,8 +59,8 @@ public static class TagsEndpoints
 
     private static async Task<IResult> GetAllTagsAsync(
         [AsParameters] PagedRequest paging,
-        ITagService service,
-        TagViewModelMapper mapper,
+        [FromServices] ITagService service,
+        [FromServices] TagViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetAllAsync(paging, ct);
@@ -76,8 +75,8 @@ public static class TagsEndpoints
 
     private static async Task<IResult> GetTagByIdAsync(
         int id,
-        ITagService service,
-        TagViewModelMapper mapper,
+        [FromServices] ITagService service,
+        [FromServices] TagViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetByIdAsync(id, ct);
@@ -86,8 +85,8 @@ public static class TagsEndpoints
 
     private static async Task<IResult> CreateTagAsync(
         [FromBody] CreateTagViewModel viewModel,
-        ITagService service,
-        TagViewModelMapper mapper,
+        [FromServices] ITagService service,
+        [FromServices] TagViewModelMapper mapper,
         CancellationToken ct)
     {
         var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
@@ -97,8 +96,8 @@ public static class TagsEndpoints
     private static async Task<IResult> UpdateTagAsync(
         int id,
         [FromBody] UpdateTagViewModel viewModel,
-        ITagService service,
-        TagViewModelMapper mapper,
+        [FromServices] ITagService service,
+        [FromServices] TagViewModelMapper mapper,
         CancellationToken ct)
     {
         var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
@@ -107,7 +106,7 @@ public static class TagsEndpoints
 
     private static async Task<IResult> DeleteTagAsync(
         int id,
-        ITagService service,
+        [FromServices] ITagService service,
         CancellationToken ct)
     {
         var success = await service.DeleteAsync(id, ct);

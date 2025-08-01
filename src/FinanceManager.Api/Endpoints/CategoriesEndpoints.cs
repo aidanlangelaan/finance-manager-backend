@@ -1,6 +1,5 @@
 using FinanceManager.Application.Categories.Interfaces;
 using FinanceManager.Application.Common.Models.Paging;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using FinanceManager.Api.ViewModels.Category;
 using FinanceManager.Api.ViewModels.Category.Mapping;
@@ -60,8 +59,8 @@ public static class CategoriesEndpoints
 
     private static async Task<IResult> GetAllCategoriesAsync(
         [AsParameters] PagedRequest paging,
-        ICategoryService service,
-        CategoryViewModelMapper mapper,
+        [FromServices] ICategoryService service,
+        [FromServices] CategoryViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetAllAsync(paging, ct);
@@ -76,8 +75,8 @@ public static class CategoriesEndpoints
 
     private static async Task<IResult> GetCategoryByIdAsync(
         int id,
-        ICategoryService service,
-        CategoryViewModelMapper mapper,
+        [FromServices] ICategoryService service,
+        [FromServices] CategoryViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetByIdAsync(id, ct);
@@ -86,8 +85,8 @@ public static class CategoriesEndpoints
 
     private static async Task<IResult> CreateCategoryAsync(
         [FromBody] CreateCategoryViewModel viewModel,
-        ICategoryService service,
-        CategoryViewModelMapper mapper,
+        [FromServices] ICategoryService service,
+        [FromServices] CategoryViewModelMapper mapper,
         CancellationToken ct)
     {
         var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
@@ -97,8 +96,8 @@ public static class CategoriesEndpoints
     private static async Task<IResult> UpdateCategoryAsync(
         int id,
         [FromBody] UpdateCategoryViewModel viewModel,
-        ICategoryService service,
-        CategoryViewModelMapper mapper,
+        [FromServices] ICategoryService service,
+        [FromServices] CategoryViewModelMapper mapper,
         CancellationToken ct)
     {
         var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
@@ -107,7 +106,7 @@ public static class CategoriesEndpoints
 
     private static async Task<IResult> DeleteCategoryAsync(
         int id,
-        ICategoryService service,
+        [FromServices] ICategoryService service,
         CancellationToken ct)
     {
         var success = await service.DeleteAsync(id, ct);

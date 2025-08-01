@@ -7,6 +7,9 @@ using FinanceManager.Application.Categories.Mapping;
 using FinanceManager.Application.Categories.Services;
 using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Common.Services;
+using FinanceManager.Application.ImportJobs.Interfaces;
+using FinanceManager.Application.ImportJobs.Mapping;
+using FinanceManager.Application.ImportJobs.Services;
 using FinanceManager.Application.Tags.Interfaces;
 using FinanceManager.Application.Tags.Mapping;
 using FinanceManager.Application.Tags.Services;
@@ -29,6 +32,7 @@ public static class ServiceCollectionExtensions
         // services
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IImportJobService, ImportJobService>();
         services.AddScoped<IPagingService, PagingService>();
         services.AddScoped<ITagService, TagService>();
         services.AddScoped<ITransactionService, TransactionService>();
@@ -36,6 +40,7 @@ public static class ServiceCollectionExtensions
         // mapping
         services.AddSingleton<AccountMapper>();
         services.AddSingleton<CategoryMapper>();
+        services.AddSingleton<ImportJobMapper>();
         services.AddSingleton<TagMapper>();
         services.AddSingleton<TransactionMapper>();
 

@@ -19,48 +19,52 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 context.Response.ContentType = "application/problem+json";
-                await context.Response.WriteAsJsonAsync(new ProblemDetails
+                var problemDetails = new ProblemDetails
                 {
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
                     Title = "Forbidden",
                     Status = StatusCodes.Status403Forbidden,
                     Detail = "Access denied."
-                });
+                };
+                await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(problemDetails));
             }
             else if (ex is FinanceManager.Application.Common.Exceptions.NotFoundException notFoundException)
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 context.Response.ContentType = "application/problem+json";
-                await context.Response.WriteAsJsonAsync(new ProblemDetails
+                var problemDetails = new ProblemDetails
                 {
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
                     Title = "Not Found",
                     Status = StatusCodes.Status404NotFound,
                     Detail = notFoundException.Message
-                });
+                };
+                await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(problemDetails));
             }
             else if (ex is FluentValidation.ValidationException validationException)
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsJsonAsync(new ValidationProblemDetails(validationException.Errors.GroupBy(e => e.PropertyName).ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()))
+                context.Response.ContentType = "application/problem+json";
+                var validationProblemDetails = new ValidationProblemDetails(validationException.Errors.GroupBy(e => e.PropertyName).ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()))
                 {
                     Type = "https://tools.ietf.org/html/rfc7807",
                     Title = "One or more validation errors occurred.",
                     Status = StatusCodes.Status400BadRequest
-                });
-                context.Response.ContentType = "application/problem+json";
+                };
+                await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(validationProblemDetails));
             }
             else
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsJsonAsync(new ProblemDetails
+                context.Response.ContentType = "application/problem+json";
+                var problemDetails = new ProblemDetails
                 {
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
                     Title = "Internal Server Error",
                     Status = StatusCodes.Status500InternalServerError,
                     Detail = "An unexpected error occurred."
-                });
-                context.Response.ContentType = "application/problem+json";
+                };
+                await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(problemDetails));
             }
         }
     }

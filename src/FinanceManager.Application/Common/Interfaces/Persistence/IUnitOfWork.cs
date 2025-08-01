@@ -6,9 +6,13 @@ public interface IUnitOfWork
 
     ICategoryRepository Categories { get; }
 
+    IImportJobRepository ImportJobs { get; }
+
     ITagRepository Tags { get; }
 
     ITransactionRepository Transactions { get; }
+
+    IUserRepository Users { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

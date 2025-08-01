@@ -1,16 +1,16 @@
 using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Domain.Entities;
-using FinanceManager.Persistence;
-using Microsoft.EntityFrameworkCore;
+using FinanceManager.Application.Common.Interfaces.Persistence;
+using System;
+using System.Threading.Tasks;
 
 namespace FinanceManager.Infrastructure.Identity.Services;
 
-public class UserProvisioningProvisioningService(AppDbContext dbContext) : IUserProvisioningService
+public class UserProvisioningProvisioningService(IUnitOfWork unitOfWork) : IUserProvisioningService
 {
     public async Task<User> GetOrCreateUserAsync(Guid keycloakId, string? name, string? email)
     {
-        var user = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.KeycloakId == keycloakId);
+        var user = await unitOfWork.Users.GetUserByKeycloakIdAsync(keycloakId);
 
         if (user == null)
         {
@@ -31,8 +31,8 @@ public class UserProvisioningProvisioningService(AppDbContext dbContext) : IUser
                 Email = email
             };
 
-            dbContext.Users.Add(user);
-            await dbContext.SaveChangesAsync();
+            await unitOfWork.Users.AddUserAsync(user);
+            await unitOfWork.SaveChangesAsync();
         }
         else
         {
@@ -51,7 +51,7 @@ public class UserProvisioningProvisioningService(AppDbContext dbContext) : IUser
 
             if (updated)
             {
-                await dbContext.SaveChangesAsync();
+                await unitOfWork.SaveChangesAsync();
             }
         }
 

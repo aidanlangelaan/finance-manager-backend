@@ -4,7 +4,6 @@ using FinanceManager.Api.Middleware;
 using FinanceManager.Api.OpenApi;
 using FinanceManager.Application.Extensions;
 using FinanceManager.Infrastructure.Extensions;
-using FinanceManager.Persistence.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
@@ -96,6 +95,7 @@ app.MapScalarApiReference((options, _) =>
 // Group and map endpoints
 app.MapAccountEndpoints();
 app.MapCategoryEndpoints();
+app.MapImportJobEndpoints();
 app.MapTagEndpoints();
 app.MapTransactionEndpoints();
 app.MapUserEndpoints();

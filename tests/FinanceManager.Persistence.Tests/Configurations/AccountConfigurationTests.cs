@@ -1,30 +1,16 @@
 using FinanceManager.Domain.Entities;
-using FinanceManager.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.Time.Testing;
-using Moq;
 using Shouldly;
+using FinanceManager.Persistence.Tests.Common;
 
 namespace FinanceManager.Persistence.Tests.Configurations;
 
-public class AccountConfigurationTests
+public class AccountConfigurationTests : PersistenceTestBase
 {
-    private DbContextOptions<AppDbContext> _options;
-
-    public AccountConfigurationTests()
-    {
-        _options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
-            .Options;
-    }
-
     [Fact]
     public void Account_Properties_AreConfiguredCorrectly()
     {
-        using (var context = new AppDbContext(_options, new Mock<Application.Common.Interfaces.ICurrentUserService>().Object, new FakeTimeProvider()))
+        using (var context = DbContext)
         {
             var accountEntityType = context.Model.FindEntityType(typeof(Account));
 
@@ -70,7 +56,7 @@ public class AccountConfigurationTests
     [Fact]
     public void Account_Relationships_AreConfiguredCorrectly()
     {
-        using (var context = new AppDbContext(_options, new Mock<Application.Common.Interfaces.ICurrentUserService>().Object, new FakeTimeProvider()))
+        using (var context = DbContext)
         {
             var accountEntityType = context.Model.FindEntityType(typeof(Account));
 

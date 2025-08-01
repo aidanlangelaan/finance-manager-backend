@@ -2,7 +2,6 @@ using FinanceManager.Api.ViewModels.Transaction;
 using FinanceManager.Api.ViewModels.Transaction.Mapping;
 using FinanceManager.Application.Common.Models.Paging;
 using FinanceManager.Application.Transactions.Interfaces;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using FinanceManager.Application.Common.Exceptions;
 using FinanceManager.Api.Common.Filters;
@@ -61,8 +60,8 @@ public static class TransactionsEndpoints
 
     private static async Task<IResult> GetAllTransactionsAsync(
         [AsParameters] PagedRequest paging,
-        ITransactionService service,
-        TransactionViewModelMapper mapper,
+        [FromServices] ITransactionService service,
+        [FromServices] TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetAllAsync(paging, ct);
@@ -77,8 +76,8 @@ public static class TransactionsEndpoints
 
     private static async Task<IResult> GetTransactionByIdAsync(
         int id,
-        ITransactionService service,
-        TransactionViewModelMapper mapper,
+        [FromServices] ITransactionService service,
+        [FromServices] TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetByIdAsync(id, ct);
@@ -87,8 +86,8 @@ public static class TransactionsEndpoints
 
     private static async Task<IResult> CreateTransactionAsync(
         [FromBody] CreateTransactionViewModel viewModel,
-        ITransactionService service,
-        TransactionViewModelMapper mapper,
+        [FromServices] ITransactionService service,
+        [FromServices] TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
         var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
@@ -98,8 +97,8 @@ public static class TransactionsEndpoints
     private static async Task<IResult> UpdateTransactionAsync(
         int id,
         [FromBody] UpdateTransactionViewModel viewModel,
-        ITransactionService service,
-        TransactionViewModelMapper mapper,
+        [FromServices] ITransactionService service,
+        [FromServices] TransactionViewModelMapper mapper,
         CancellationToken ct)
     {
         try
@@ -115,7 +114,7 @@ public static class TransactionsEndpoints
 
     private static async Task<IResult> DeleteTransactionAsync(
         int id,
-        ITransactionService service,
+        [FromServices] ITransactionService service,
         CancellationToken ct)
     {
         var success = await service.DeleteAsync(id, ct);

@@ -25,15 +25,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FinanceManager.Infrastructure\FinanceManager.Infrastructure.csproj" />
-    
+    <ProjectReference Include="..\FinanceManager.Persistence\FinanceManager.Persistence.csproj" />
+
   </ItemGroup>
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Requests\http-client.private.env.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Common\" />
   </ItemGroup>
 
 </Project>

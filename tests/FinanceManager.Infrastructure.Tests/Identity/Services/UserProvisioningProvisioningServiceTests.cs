@@ -1,10 +1,6 @@
-
-using FinanceManager.Application.Common.Interfaces;
+using FinanceManager.Application.Common.Interfaces.Persistence;
 using FinanceManager.Domain.Entities;
 using FinanceManager.Infrastructure.Identity.Services;
-using FinanceManager.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Shouldly;
 
@@ -12,21 +8,15 @@ namespace FinanceManager.Infrastructure.Tests.Identity.Services;
 
 public class UserProvisioningProvisioningServiceTests
 {
-    private readonly DbContextOptions<AppDbContext> _dbContextOptions;
-    private readonly Mock<ICurrentUserService> _currentUserServiceMock;
-    private readonly TimeProvider _timeProvider;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<IUserRepository> _userRepositoryMock;
 
     public UserProvisioningProvisioningServiceTests()
     {
-        _dbContextOptions = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-        _currentUserServiceMock = new Mock<ICurrentUserService>();
-        _timeProvider = new FakeTimeProvider();
-        _currentUserServiceMock.Setup(x => x.UserId).Returns(1);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _unitOfWorkMock.Setup(u => u.Users).Returns(_userRepositoryMock.Object);
     }
-
-    private AppDbContext CreateContext() => new AppDbContext(_dbContextOptions, _currentUserServiceMock.Object, _timeProvider);
 
     [Fact]
     public async Task GetOrCreateUserAsync_ShouldCreateUser_WhenUserDoesNotExist()
@@ -36,8 +26,10 @@ public class UserProvisioningProvisioningServiceTests
         var name = "Test User";
         var email = "test@example.com";
 
-        await using var context = CreateContext();
-        var sut = new UserProvisioningProvisioningService(context);
+        _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((User)null!);
+
+        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
 
         // Act
         var result = await sut.GetOrCreateUserAsync(keycloakId, name, email);
@@ -47,9 +39,8 @@ public class UserProvisioningProvisioningServiceTests
         result.KeycloakId.ShouldBe(keycloakId);
         result.DisplayName.ShouldBe(name);
         result.Email.ShouldBe(email);
-
-        var userInDb = await context.Users.FindAsync(result.Id);
-        userInDb.ShouldNotBeNull();
+        _userRepositoryMock.Verify(r => r.AddUserAsync(It.Is<User>(u => u.KeycloakId == keycloakId && u.DisplayName == name && u.Email == email), It.IsAny<CancellationToken>()), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -57,22 +48,23 @@ public class UserProvisioningProvisioningServiceTests
     {
         // Arrange
         var keycloakId = Guid.NewGuid();
-        var name = "Test User";
-        var email = "test@example.com";
-        var user = new User { KeycloakId = keycloakId, DisplayName = name, Email = email };
+        var existingUser = new User { Id = 1, KeycloakId = keycloakId, DisplayName = "Existing User", Email = "existing@example.com" };
 
-        await using var context = CreateContext();
-        context.Users.Add(user);
-        await context.SaveChangesAsync();
+        _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingUser);
 
-        var sut = new UserProvisioningProvisioningService(context);
+        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
 
         // Act
         var result = await sut.GetOrCreateUserAsync(keycloakId, "New Name", "new@example.com");
 
         // Assert
         result.ShouldNotBeNull();
-        result.Id.ShouldBe(user.Id);
+        result.Id.ShouldBe(existingUser.Id);
+        result.DisplayName.ShouldBe("New Name");
+        result.Email.ShouldBe("new@example.com");
+        _userRepositoryMock.Verify(r => r.AddUserAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -80,22 +72,21 @@ public class UserProvisioningProvisioningServiceTests
     {
         // Arrange
         var keycloakId = Guid.NewGuid();
-        var name = "Test User";
-        var email = "test@example.com";
-        var user = new User { KeycloakId = keycloakId, DisplayName = name, Email = email };
+        var existingUser = new User { Id = 1, KeycloakId = keycloakId, DisplayName = "Old Name", Email = "old@example.com" };
 
-        await using var context = CreateContext();
-        context.Users.Add(user);
-        await context.SaveChangesAsync();
+        _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingUser);
 
-        var sut = new UserProvisioningProvisioningService(context);
+        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
 
         // Act
         var result = await sut.GetOrCreateUserAsync(keycloakId, "New Name", "new@example.com");
 
         // Assert
+        result.ShouldNotBeNull();
         result.DisplayName.ShouldBe("New Name");
         result.Email.ShouldBe("new@example.com");
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -105,11 +96,15 @@ public class UserProvisioningProvisioningServiceTests
         var keycloakId = Guid.NewGuid();
         var email = "test@example.com";
 
-        await using var context = CreateContext();
-        var sut = new UserProvisioningProvisioningService(context);
+        _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((User)null!);
+
+        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(() => sut.GetOrCreateUserAsync(keycloakId, null, email));
+        _userRepositoryMock.Verify(r => r.AddUserAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -119,10 +114,14 @@ public class UserProvisioningProvisioningServiceTests
         var keycloakId = Guid.NewGuid();
         var name = "Test User";
 
-        await using var context = CreateContext();
-        var sut = new UserProvisioningProvisioningService(context);
+        _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((User)null!);
+
+        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(() => sut.GetOrCreateUserAsync(keycloakId, name, null));
+        _userRepositoryMock.Verify(r => r.AddUserAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

@@ -2,6 +2,12 @@
 - If accounts (both source and target) aren't recognized as any of the users accounts, the import of the row will fail with a "Unknown accounts" error. In the future I want to see about alternative ways to deal with this.
 	- After import correct the incorrect transactions and assign them to a (new) account?
 
+#### Import Job
+- Add option to save mapping profiles so they can be reused
+- Option to cancel an import? 
+	- Before processing
+	- During processing -> how to deal with this?
+
 #### Transactions
 - Add tags to create/update
 

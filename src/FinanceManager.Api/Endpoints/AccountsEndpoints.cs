@@ -59,8 +59,8 @@ public static class AccountsEndpoints
 
     private static async Task<IResult> GetAllAccountsAsync(
         [AsParameters] PagedRequest paging,
-        IAccountService service,
-        AccountViewModelMapper mapper,
+        [FromServices] IAccountService service,
+        [FromServices] AccountViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetAllAsync(paging, ct);
@@ -75,8 +75,8 @@ public static class AccountsEndpoints
 
     private static async Task<IResult> GetAccountByIdAsync(
         int id,
-        IAccountService service,
-        AccountViewModelMapper mapper,
+        [FromServices] IAccountService service,
+        [FromServices] AccountViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetByIdAsync(id, ct);
@@ -85,8 +85,8 @@ public static class AccountsEndpoints
 
     private static async Task<IResult> CreateAccountAsync(
         [FromBody] CreateAccountViewModel viewModel,
-        IAccountService service,
-        AccountViewModelMapper mapper,
+        [FromServices] IAccountService service,
+        [FromServices] AccountViewModelMapper mapper,
         CancellationToken ct)
     {
         var id = await service.CreateAsync(mapper.ToDto(viewModel), ct);
@@ -96,8 +96,8 @@ public static class AccountsEndpoints
     private static async Task<IResult> UpdateAccountAsync(
         int id,
         [FromBody] UpdateAccountViewModel viewModel,
-        IAccountService service,
-        AccountViewModelMapper mapper,
+        [FromServices] IAccountService service,
+        [FromServices] AccountViewModelMapper mapper,
         CancellationToken ct)
     {
         var success = await service.UpdateAsync(id, mapper.ToDto(viewModel), ct);
@@ -106,7 +106,7 @@ public static class AccountsEndpoints
 
     private static async Task<IResult> DeleteAccountAsync(
         int id,
-        IAccountService service,
+        [FromServices] IAccountService service,
         CancellationToken ct)
     {
         var success = await service.DeleteAsync(id, ct);
