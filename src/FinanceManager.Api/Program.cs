@@ -52,7 +52,7 @@ builder.Services.AddOpenApiDocument(config =>
     config.AddSecurity("Bearer", [], new OpenApiSecurityScheme
     {
         Type = OpenApiSecuritySchemeType.Http,
-        Scheme = "bearer",
+        Scheme = "Bearer",
         BearerFormat = "JWT",
         Description = "Input your JWT token in this format: Bearer {your token}."
     });
@@ -66,7 +66,7 @@ builder.Services.AddOpenApiDocument(config =>
         };
     };
 
-    config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("bearer"));
+    config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
 });
 
 var app = builder.Build();

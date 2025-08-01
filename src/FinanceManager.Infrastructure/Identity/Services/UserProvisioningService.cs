@@ -1,12 +1,10 @@
 using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Domain.Entities;
 using FinanceManager.Application.Common.Interfaces.Persistence;
-using System;
-using System.Threading.Tasks;
 
 namespace FinanceManager.Infrastructure.Identity.Services;
 
-public class UserProvisioningProvisioningService(IUnitOfWork unitOfWork) : IUserProvisioningService
+public class UserProvisioningService(IUnitOfWork unitOfWork) : IUserProvisioningService
 {
     public async Task<User> GetOrCreateUserAsync(Guid keycloakId, string? name, string? email)
     {

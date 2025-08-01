@@ -6,12 +6,12 @@ using Shouldly;
 
 namespace FinanceManager.Infrastructure.Tests.Identity.Services;
 
-public class UserProvisioningProvisioningServiceTests
+public class UserProvisioningServiceTests
 {
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
 
-    public UserProvisioningProvisioningServiceTests()
+    public UserProvisioningServiceTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _userRepositoryMock = new Mock<IUserRepository>();
@@ -29,7 +29,7 @@ public class UserProvisioningProvisioningServiceTests
         _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((User)null!);
 
-        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
+        var sut = new UserProvisioningService(_unitOfWorkMock.Object);
 
         // Act
         var result = await sut.GetOrCreateUserAsync(keycloakId, name, email);
@@ -53,7 +53,7 @@ public class UserProvisioningProvisioningServiceTests
         _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingUser);
 
-        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
+        var sut = new UserProvisioningService(_unitOfWorkMock.Object);
 
         // Act
         var result = await sut.GetOrCreateUserAsync(keycloakId, "New Name", "new@example.com");
@@ -77,7 +77,7 @@ public class UserProvisioningProvisioningServiceTests
         _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingUser);
 
-        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
+        var sut = new UserProvisioningService(_unitOfWorkMock.Object);
 
         // Act
         var result = await sut.GetOrCreateUserAsync(keycloakId, "New Name", "new@example.com");
@@ -99,7 +99,7 @@ public class UserProvisioningProvisioningServiceTests
         _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((User)null!);
 
-        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
+        var sut = new UserProvisioningService(_unitOfWorkMock.Object);
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(() => sut.GetOrCreateUserAsync(keycloakId, null, email));
@@ -117,7 +117,7 @@ public class UserProvisioningProvisioningServiceTests
         _userRepositoryMock.Setup(r => r.GetUserByKeycloakIdAsync(keycloakId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((User)null!);
 
-        var sut = new UserProvisioningProvisioningService(_unitOfWorkMock.Object);
+        var sut = new UserProvisioningService(_unitOfWorkMock.Object);
 
         // Act & Assert
         await Should.ThrowAsync<InvalidOperationException>(() => sut.GetOrCreateUserAsync(keycloakId, name, null));

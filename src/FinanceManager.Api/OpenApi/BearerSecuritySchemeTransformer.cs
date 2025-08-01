@@ -16,7 +16,7 @@ internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvi
             doc.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
             {
                 Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
+                Scheme = "Bearer",
                 In = ParameterLocation.Header,
                 BearerFormat = "JWT"
             };

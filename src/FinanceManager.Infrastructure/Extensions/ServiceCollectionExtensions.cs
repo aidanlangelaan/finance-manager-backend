@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IUserProvisioningService, UserProvisioningProvisioningService>();
+        services.AddScoped<IUserProvisioningService, UserProvisioningService>();
         services.AddSingleton(TimeProvider.System);
 
         return services;
