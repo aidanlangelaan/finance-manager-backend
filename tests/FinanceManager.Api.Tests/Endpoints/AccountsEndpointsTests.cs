@@ -129,7 +129,7 @@ public class AccountsEndpointsTests(CustomWebApplicationFactory factory) : IClas
             PageNumber = 1,
             PageSize = 10
         };
-        factory.AccountServiceMock.Setup(s => s.GetAllAsync(It.IsAny<PagedRequest>(), It.IsAny<CancellationToken>()))
+        factory.AccountServiceMock.Setup(s => s.GetAllAsync(It.Is<PagedRequest>(p => p.PageNumber == 1 && p.PageSize == 10), It.IsAny<CancellationToken>()))
             .ReturnsAsync(pagedResult);
 
         // Act

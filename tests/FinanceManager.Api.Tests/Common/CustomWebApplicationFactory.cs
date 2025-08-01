@@ -11,6 +11,11 @@ using FinanceManager.Application.Categories.Interfaces;
 using FinanceManager.Application.Tags.Interfaces;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
+using FinanceManager.Api.ViewModels.Account.Mapping;
+using FinanceManager.Api.ViewModels.Category.Mapping;
+using FinanceManager.Api.ViewModels.Tag.Mapping;
+using FinanceManager.Api.ViewModels.Transaction.Mapping;
+using FinanceManager.Api.ViewModels.ImportJob.Mapping;
 
 namespace FinanceManager.Api.Tests.Common;
 
@@ -23,7 +28,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public Mock<IAccountService> AccountServiceMock { get; } = new();
     public Mock<ICategoryService> CategoryServiceMock { get; } = new();
     public Mock<ITagService> TagServiceMock { get; } = new();
-    public Mock<FinanceManager.Application.Transactions.Interfaces.ITransactionService> TransactionServiceMock { get; } = new();
+    public Mock<Application.Transactions.Interfaces.ITransactionService> TransactionServiceMock { get; } = new();
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -53,6 +58,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<FinanceManager.Application.Transactions.Interfaces.ITransactionService>();
             services.AddSingleton<FinanceManager.Application.Transactions.Interfaces.ITransactionService>(TransactionServiceMock.Object);
+
+            services.AddSingleton<AccountViewModelMapper>();
+            services.AddSingleton<CategoryViewModelMapper>();
+            services.AddSingleton<TagViewModelMapper>();
+            services.AddSingleton<TransactionViewModelMapper>();
+            services.AddSingleton<ImportJobViewModelMapper>();
 
             services.AddAuthentication("TestScheme")
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", options => { });
