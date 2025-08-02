@@ -1,4 +1,4 @@
-using FinanceManager.Application.Common.Interfaces.Paging;
+using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Models.Paging;
 using FinanceManager.Application.Extensions;
 

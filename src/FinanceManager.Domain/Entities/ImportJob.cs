@@ -19,7 +19,7 @@ public class ImportJob : AuditableEntity
 
     public ImportJobStatus Status { get; set; } = ImportJobStatus.Pending;
 
-    public DateTime StartedAt { get; set; }
+    public DateTime? StartedAt { get; set; }
 
     public DateTime? FinishedAt { get; set; }
 

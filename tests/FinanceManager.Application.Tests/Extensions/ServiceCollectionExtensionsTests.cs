@@ -3,7 +3,7 @@ using FinanceManager.Application.Accounts.Interfaces;
 using FinanceManager.Application.Accounts.Mapping;
 using FinanceManager.Application.Accounts.Services;
 using FinanceManager.Application.Accounts.Validators;
-using FinanceManager.Application.Common.Interfaces.Paging;
+using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Services;
 using FinanceManager.Application.Extensions;
 using FluentValidation;

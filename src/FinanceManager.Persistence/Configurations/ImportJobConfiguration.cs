@@ -27,7 +27,6 @@ public class ImportJobConfiguration : IEntityTypeConfiguration<ImportJob>
             .HasColumnType("varchar(50)");
 
         builder.Property(j => j.StartedAt)
-            .IsRequired()
             .HasColumnType("timestamp");
 
         builder.Property(j => j.FinishedAt)

@@ -1,6 +1,5 @@
 using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Interfaces.Persistence;
-using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Transactions.Dtos;
 using FinanceManager.Application.Transactions.Mapping;
 using FinanceManager.Application.Transactions.Services;

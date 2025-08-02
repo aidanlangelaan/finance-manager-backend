@@ -3,7 +3,6 @@ using FinanceManager.Application.ImportJobs.Interfaces;
 using FinanceManager.Application.ImportJobs.Mapping;
 using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Interfaces.Persistence;
-using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Common.Models.Paging;
 
 namespace FinanceManager.Application.ImportJobs.Services;
@@ -12,7 +11,8 @@ public class ImportJobService(
     IUnitOfWork unitOfWork,
     ICurrentUserService currentUser,
     IPagingService pagingService,
-    ImportJobMapper mapper) : IImportJobService
+    ImportJobMapper mapper,
+    IFileStorageService _fileStorageService) : IImportJobService
 {
     public async Task<ImportJobDetailsResponseDto?> GetByIdAsync(int id, CancellationToken ct)
     {
@@ -29,6 +29,8 @@ public class ImportJobService(
     public async Task<int> CreateAsync(CreateImportJobDto dto, Stream stream, CancellationToken ct)
     {
         var entity = mapper.ToEntity(dto);
+        entity.StoredFileName = await _fileStorageService.SaveFileAsync(stream, dto.OriginalFileName, ct);
+
         await unitOfWork.ImportJobs.AddAsync(entity, ct);
         await unitOfWork.SaveChangesAsync(ct);
 

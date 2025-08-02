@@ -22,10 +22,6 @@ public static class ModelBuilderExtensions
                     .Property("Id")
                     .ValueGeneratedOnAdd();
 
-                modelBuilder.Entity(clrType)
-                    .Property("Id")
-                    .ValueGeneratedOnAdd();
-
                 var rowVersionProperty = modelBuilder.Entity(clrType)
                     .Property("RowVersion")
                     .IsConcurrencyToken()

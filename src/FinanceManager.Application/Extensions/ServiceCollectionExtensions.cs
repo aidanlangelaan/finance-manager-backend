@@ -5,7 +5,7 @@ using FinanceManager.Application.Accounts.Validators;
 using FinanceManager.Application.Categories.Interfaces;
 using FinanceManager.Application.Categories.Mapping;
 using FinanceManager.Application.Categories.Services;
-using FinanceManager.Application.Common.Interfaces.Paging;
+using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Services;
 using FinanceManager.Application.ImportJobs.Interfaces;
 using FinanceManager.Application.ImportJobs.Mapping;

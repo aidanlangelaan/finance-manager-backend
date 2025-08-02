@@ -3,7 +3,6 @@ using FinanceManager.Application.Accounts.Interfaces;
 using FinanceManager.Application.Accounts.Mapping;
 using FinanceManager.Application.Common.Interfaces;
 using FinanceManager.Application.Common.Interfaces.Persistence;
-using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Common.Models.Paging;
 
 namespace FinanceManager.Application.Accounts.Services;

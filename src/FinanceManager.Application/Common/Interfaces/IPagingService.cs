@@ -1,7 +1,6 @@
 using FinanceManager.Application.Common.Models.Paging;
-using System.Linq;
 
-namespace FinanceManager.Application.Common.Interfaces.Paging;
+namespace FinanceManager.Application.Common.Interfaces;
 
 public interface IPagingService
 {

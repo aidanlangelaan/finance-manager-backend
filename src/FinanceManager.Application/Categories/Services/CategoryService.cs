@@ -2,7 +2,6 @@ using FinanceManager.Application.Categories.Dtos;
 using FinanceManager.Application.Categories.Interfaces;
 using FinanceManager.Application.Categories.Mapping;
 using FinanceManager.Application.Common.Interfaces;
-using FinanceManager.Application.Common.Interfaces.Paging;
 using FinanceManager.Application.Common.Interfaces.Persistence;
 using FinanceManager.Application.Common.Models.Paging;
 

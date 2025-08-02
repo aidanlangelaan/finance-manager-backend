@@ -22,22 +22,23 @@ public static class ImportJobsEndpoints
             .WithName("GetAllImportJobs")
             .WithSummary("Get all paged import jobs")
             .WithDescription("Returns a paginated list of all import jobs for the authenticated user.")
-            .Produces<IEnumerable<ImportJobViewModel>>();
+            .Produces<PagedResult<ImportJobViewModel>>(StatusCodes.Status200OK, "application/json");
 
         group.MapGet("/{id:int}", GetImportJobByIdAsync)
             .WithName("GetImportJobById")
             .WithSummary("Get import job by ID")
-            .WithDescription("Returns details of an import job including any errors.")
-            .Produces<ImportJobDetailsViewModel>()
+            .WithDescription("Returns details of a specific import job by its ID if it belongs to the authenticated user, including any errors.")
+            .Produces<ImportJobDetailsViewModel>(StatusCodes.Status200OK, "application/json")
             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPost("/", CreateImportJobAsync)
             .WithName("CreateImportJob")
             .WithSummary("Create a new import job")
             .WithDescription("Uploads a CSV file and starts a background import job.")
+            .DisableAntiforgery()
             .Accepts<CreateImportJobViewModel>("multipart/form-data")
-            .Produces<int>(StatusCodes.Status201Created)
-            .Produces(StatusCodes.Status400BadRequest);
+            .Produces<int>(StatusCodes.Status201Created, "application/json")
+            .ProducesValidationProblem();
 
         group.MapPatch("/{id:int}", UpdateImportJobAsync)
             .WithName("UpdateImportJob")
@@ -55,8 +56,8 @@ public static class ImportJobsEndpoints
         [FromForm] string originalFileName,
         [FromForm] string mappingProfileJson,
         [FromForm] bool notifyOnCompletion,
-        IImportJobService service,
-        ImportJobViewModelMapper mapper,
+        [FromServices] IImportJobService service,
+        [FromServices] ImportJobViewModelMapper mapper,
         CancellationToken ct)
     {
         if (file.Length == 0)
@@ -89,8 +90,8 @@ public static class ImportJobsEndpoints
 
     private static async Task<IResult> GetAllImportJobsAsync(
         [AsParameters] PagedRequest paging,
-        IImportJobService service,
-        ImportJobViewModelMapper mapper,
+        [FromServices] IImportJobService service,
+        [FromServices] ImportJobViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetAllAsync(paging, ct);
@@ -105,8 +106,8 @@ public static class ImportJobsEndpoints
 
     private static async Task<IResult> GetImportJobByIdAsync(
         int id,
-        IImportJobService service,
-        ImportJobViewModelMapper mapper,
+        [FromServices] IImportJobService service,
+        [FromServices] ImportJobViewModelMapper mapper,
         CancellationToken ct)
     {
         var result = await service.GetByIdAsync(id, ct);
@@ -116,8 +117,8 @@ public static class ImportJobsEndpoints
     private static async Task<IResult> UpdateImportJobAsync(
         int id,
         [FromBody] UpdateImportJobViewModel viewModel,
-        IImportJobService service,
-        ImportJobViewModelMapper mapper,
+        [FromServices] IImportJobService service,
+        [FromServices] ImportJobViewModelMapper mapper,
         CancellationToken ct)
     {
         var success = await service.UpdateAsync(id, mapper.ToUpdateDto(viewModel), ct);

@@ -1,6 +1,7 @@
 using FinanceManager.Api.Common.Validators;
 using FinanceManager.Api.ViewModels.Account.Mapping;
 using FinanceManager.Api.ViewModels.Category.Mapping;
+using FinanceManager.Api.ViewModels.ImportJob.Mapping;
 using FinanceManager.Api.ViewModels.Tag.Mapping;
 using FinanceManager.Api.ViewModels.Transaction.Mapping;
 using FinanceManager.Application.Common.Interfaces.Persistence;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<AccountViewModelMapper>();
         services.AddSingleton<CategoryViewModelMapper>();
+        services.AddSingleton<ImportJobViewModelMapper>();
         services.AddSingleton<TagViewModelMapper>();
         services.AddSingleton<TransactionViewModelMapper>();
 
